@@ -4,6 +4,7 @@ python/share
 com_crashlytics_export_strings
 .vault
 certs/*
+k3s-ansible/*
 
 
 # Created by .ignore support plugin (hsz.mobi)

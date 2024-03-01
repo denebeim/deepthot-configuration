@@ -4,5 +4,4 @@ collections:
 - name: ansible.posix
   version: 1.5.4
 - name: community.general
-  version: 8.2.0
-- name: ansible.module_utils
+  version: 8.4.0
