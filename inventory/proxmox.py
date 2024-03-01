@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 
 # Copyright (C) 2014  Mathieu GAUTHIER-LAFAYE <gauthierl@lapth.cnrs.fr>
@@ -42,7 +43,7 @@ from six import iteritems
 from six.moves.urllib.error import HTTPError
 
 from ansible.module_utils.urls import open_url
-
+import yaml
 
 class ProxmoxNodeList(list):
     def get_names(self):
@@ -521,7 +522,9 @@ def main():
     if options.pretty:
         indent = 2
 #TODO
-    print((json.dumps(data, indent=indent)))
+#    print((json.dumps(data, indent=indent)))
+
+    print(yaml.dump(data))
 
 
 if __name__ == '__main__':

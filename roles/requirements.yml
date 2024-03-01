@@ -4,4 +4,4 @@ roles:
   - name: geerlingguy.kubernetes
   - name: nginxinc.nginx_config
   - name: geerlingguy.containerd
-  - name: six
+  # - name: six
