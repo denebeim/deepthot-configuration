@@ -6,5 +6,7 @@ want_facts: true
 compose:
   ansible_host: proxmox_agent_interfaces[1]["ip-addresses"][0].split('/')[0]
   ansible_user: ansible
-
-  
+keyed_groups:
+  - key: proxmox_tags_parsed
+    separator: ""
+    prefix: group
