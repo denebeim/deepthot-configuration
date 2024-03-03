@@ -229,6 +229,40 @@ Days into it here, but https://techviewleo.com/install-kubernetes-cluster-using-
 
 I think I've got a good one for installing awx as well, but I believe I must have metallb installed.  (fun, I loved it last time I had k8s up)
 
+setting up k3s: curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE=644 sh - 
+then metallb:
+
+```yaml
+cat >metal.yaml <<EOF
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: first-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - 192.168.42.200-192.168.42.209
+EOF
+
+cat >add.yaml <<EOF
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: deepthot
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - first-pool
+
+EOF
+
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.3/config/manifests/metallb-native.yaml
+kubectl apply -f metal.yaml
+```
+
+AWX install, following https://ansible.readthedocs.io/projects/awx-operator/en/latest/installation/basic-install.html and
+https://github.com/kurokobo/awx-on-k3s.git
 
 ToDo: here are the things I want to do.  I'm putting them here to keep from getting distracted from them.
 1. zfs
