@@ -198,8 +198,8 @@ Oh the hp is called pve, which is the default.  I'm hoping heartogold will come 
 Currently h2gt2g is up and running, but the vms are all on pve's local disk.  So, the next step is
 
 1. [x] Migrate the hard drives from pve to h2gt2g
-1. Migrate the machines to eddie
-1. Migrate the hard drives to eddie's boot disk
+1. [x]Migrate the machines to eddie
+1. [x]Migrate the hard drives to eddie's boot disk
 
 ## Pihole
 I installed pihole on a really too big for it VM.  I should probably use debian for it.  Anyway, the only issue was it wants to have
@@ -215,22 +215,33 @@ search deepthot.aa deepthot
 
 Came up cleanly, the best place to get blacklists is:  https://firebog.net it has a ton of lists of varying qualities.
 
-## awx 
+## k3s 
 
-1. get new awx up
+The only distrobution that I've been successful with is centos stream 8 generic cloud.
+The machine should be at least 4gb ram, 2 cores, and 23gb disk.
 
-https://www.apalrd.net/posts/2023/pve_cloud/ has a great little script that installs images for some of the more popular operating systems and then makes them into a template.  
+It takes forever to set up wait for the dns name to appear.
+sheesh it's *always* selinux.  disable it and reboot.
 
-I'm having a ton of grief installing rocky 9.  It took for friggin ever on the big machine.  I think it's *really* friggen slow.  Not entirely sure why.
+K3s is really easy to set up.  
+```bash
+curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE=644 sh - 
+```
 
-I'm using https://ansible.readthedocs.io/projects/awx-operator/en/latest/installation/kind-install.html for the awx install.  I may end up just saying eff it and install this:  https://youtu.be/UoOcLXfa8EU?si=SdiHY-Ir2ZUBzwFZ  then deploy awx with https://ansible.readthedocs.io/projects/awx-operator/en/latest/installation/helm-install-on-existing-cluster.html
+curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE=644 sh -
 
-Days into it here, but https://techviewleo.com/install-kubernetes-cluster-using-k3s-on-debian/ has a really concise description on how to install k3s
+This installs k3s.  The environment variable sets the kubeconfig to readable so the kubectl can simply be run on the machine.
 
-I think I've got a good one for installing awx as well, but I believe I must have metallb installed.  (fun, I loved it last time I had k8s up)
+This is really fugly I'm hoping to find a better way.  k3s includes a load balancer which interacts poorly with metallb.  So you need to hack the service file.
 
-setting up k3s: curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE=644 sh - 
-then metallb:
+```sh
+curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.28.6+k3s2 K3S_KUBECONFIG_MODE=644 sh - 
+sudo sed -i '/server/s/r /r --disable servicelb /' /etc/systemd/system/k3s.service
+sudo systemctl daemon-reload && sudo systemctl restart k3s
+```
+ToDo: find a way to set this in a config file or env variable
+
+Before you can do pretty much anything you need a way to create ips for ingresses into the system.  I usually choose metallb since it's really simple and works great.  You simply 
 
 ```yaml
 cat >metal.yaml <<EOF
@@ -242,9 +253,6 @@ metadata:
 spec:
   addresses:
   - 192.168.42.200-192.168.42.209
-EOF
-
-cat >add.yaml <<EOF
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
@@ -258,24 +266,129 @@ spec:
 EOF
 
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.3/config/manifests/metallb-native.yaml
+kubectl wait deployment controller -n metallb-system --for condition=Available=True --timeout=120s 
 kubectl apply -f metal.yaml
 ```
+Now you have k3s cluster.  This is a single node cluster with both controlplane and workers.  
+
+ToDo: document how to do separate worker nodes and set up HA.
+
+
+## get new awx up
+
+The next thing to do is to bring up AWX.  The best way I've found is using [kurokobo's](https://github.com/kurokobo/awx-on-k3s) configuration.  I haven't looked in detail to see if there's an easier way, but this one works.  However it only works with rpm distros, rocky, fedora, etc
+
+From their README:
+
+Ensure curl and git are installed `sudo apt install git curl -y` or whatever your distro wants.
+
+Clone the repository to install from:
+```sh
+cd ~
+git clone https://github.com/kurokobo/awx-on-k3s.git
+cd awx-on-k3s
+git checkout 2.12.1
+```
+
+Deploy the operator by `kubectl apply -k operator`
+
+Wait for the deployment to finish`kubectl wait deployment awx-operator-controller-manager  -n awx --for condition=Available=True --timeout=300s`
+
+Edit the configuration:
+
+```
+AWX_HOST="$MY_HOST"
+openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -out ./base/tls.crt -keyout ./base/tls.key -subj "/CN=${AWX_HOST}/O=${AWX_HOST}" -addext "subjectAltName = DNS:${AWX_HOST}"
+```
+
+Modify hostname in base/awx.yaml.
+```
+sed -i "s/awx.example.com/$AWX_HOST/" base/awx.yaml
+```
+For instance:
+```
+...
+spec:
+  ...
+  ingress_type: ingress
+  ingress_hosts:
+    - hostname: awx.example.com     👈👈👈
+      tls_secret: awx-secret-tls
+...
+```
+
+IMPORTANT: This is the hostname of ingress, not the host.
+
+
+Modify two passwords in base/kustomization.yaml. Note that the password under awx-postgres-configuration should not contain single or double quotes (', ") or backslashes (\) to avoid any issues during deployment, backup or restoration.
+
+...
+  - name: awx-postgres-configuration
+    type: Opaque
+    literals:
+      - host=awx-postgres-13
+      - port=5432
+      - database=awx
+      - username=awx
+      - password=Ansible123!     👈👈👈
+      - type=managed
+
+  - name: awx-admin-password
+    type: Opaque
+    literals:
+      - password=Ansible123!     👈👈👈
+...
+
+If you want to have persistent volumes on the local machine do something like:
+
+```bash
+sudo mkdir -p /data/postgres-13
+sudo mkdir -p /data/projects
+sudo chmod 755 /data/postgres-13
+sudo chown 1000:0 /data/projects
+```
+Real storage TBD
+
+Now deploy it:
+
+`kubectl apply -k base`
+
+`watch kubectl -n awx get awx,all,ingress,secrets` is nice to watch the progress.
+
+and `kubectl -n awx logs -f deployments/awx-operator-controller-manager` is good for watching what's going on.
+
+This takes a *long* time.  Go off and do something.
+
+
+
+https://www.apalrd.net/posts/2023/pve_cloud/ has a great little script that installs images for some of the more popular operating systems and then makes them into a template.  
+
+I'm having a ton of grief installing rocky 9.  It took for friggin ever on the big machine.  I think it's *really* friggen slow.  Not entirely sure why.
+
+I'm using https://ansible.readthedocs.io/projects/awx-operator/en/latest/installation/kind-install.html for the awx install.  I may end up just saying eff it and install this:  https://youtu.be/UoOcLXfa8EU?si=SdiHY-Ir2ZUBzwFZ  then deploy awx with https://ansible.readthedocs.io/projects/awx-operator/en/latest/installation/helm-install-on-existing-cluster.html
+
+Days into it here, but https://techviewleo.com/install-kubernetes-cluster-using-k3s-on-debian/ has a really concise description on how to install k3s
+
+I think I've got a good one for installing awx as well, but I believe I must have metallb installed.  (fun, I loved it last time I had k8s up)
+
 
 AWX install, following https://ansible.readthedocs.io/projects/awx-operator/en/latest/installation/basic-install.html and
 https://github.com/kurokobo/awx-on-k3s.git
 
 ToDo: here are the things I want to do.  I'm putting them here to keep from getting distracted from them.
+1. rancher
+1. auto certs
+1. truNAS
 1. zfs
 1. cloudflare
 1. k8s
-1. rancher
 1. plex
 1. mastodon
 1. other fediverse things
 1. vscode clean this up
 1. zsh
-1. awx getting proxmox inventory
-1. pxe server (look at maas and the other thing tt mentioned) (tt is technotim on youtube for future joy)
+1. ~~awx getting proxmox inventory~~
+1. ~~pxe server (look at maas and the other thing tt mentioned) (tt is technotim on youtube for future joy)~~
 1. gitlab
 1. figure out why some vms are not getting dns name correctly.  Hypothosis trick is not to release the leases on reboot.
 1. vlans
