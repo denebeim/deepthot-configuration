@@ -359,6 +359,56 @@ and `kubectl -n awx logs -f deployments/awx-operator-controller-manager` is good
 
 This takes a *long* time.  Go off and do something.
 
+### Dynamic Proxmox Inventory
+
+  First thing you do after installing awx is to log in and create a project.  That's about half way down the menu.  You'll need a git repository to write your playbooks in.  If you use git instead of http, you'll need to put a credential in.  I ended up adding several credentials just cause I was there.
+
+You'll also need to create a custom credential type like this:
+
+input configuration: 
+
+```yaml
+fields:
+  - id: username
+    type: string
+    label: Username
+  - id: password
+    type: string
+    label: Password
+    secret: true
+required:
+  - username
+  - password
+```
+injector configuration:
+```yaml
+env:
+  PROXMOX_USER: '{{ username }}'
+  PROXMOX_PASSWORD: '{{ password }}'
+  PROXMOX_USERNAME: '{{ username }}'
+```
+
+I am using two variables for the user because I've seen documentation that said both are used.  
+
+This is what pulls out the information.  One of the cool things about it is you use tags to mark what kind of machine this is with what features.  For instance is it going to have docker?  Kubernetes? Join the ipa, etc.
+
+```yaml
+cat <<EOF >inventory.proxmox.yaml
+plugin: community.general.proxmox
+validate_certs: false
+want_facts: true
+url: https://pve.deepthot.aa:8006
+compose:
+  ansible_host: proxmox_agent_interfaces[1]["ip-addresses"][0].split('/')[0]
+  ansible_user: ansible
+keyed_groups:
+  - key: proxmox_tags_parsed
+    separator: ""
+    prefix: group
+EOF
+```
+
+
 
 
 https://www.apalrd.net/posts/2023/pve_cloud/ has a great little script that installs images for some of the more popular operating systems and then makes them into a template.  
