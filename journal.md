@@ -408,8 +408,42 @@ keyed_groups:
 EOF
 ```
 
-
-
+### LDAP
+* server: ldap://192.168.42.4 grouptype: groupOfNamesType
+* LDAP Bind DN: uid=ldap,cn=sysaccounts,cn=etc,dc=deepthot,dc=aa
+* LDAP User DN: uid=%(user)s,cn=users,cn=accounts,dc=deepthot,dc=aa
+* LDAP User Search: 
+```json
+[
+  "cn=users,cn=accounts,dc=deepthot,dc=aa",
+  "SCOPE_SUBTREE",
+  "(uid=%(user)s)"
+]
+```
+* LDAP Group Search:
+```json
+[
+  "cn=groups,cn=accounts,dc=deepthot,dc=aa",
+  "SCOPE_SUBTREE",
+  "(objectClass=posixgroup)"
+]
+```
+* LDAP Attribute Map:
+```json
+{
+  "first_name": "givenName",
+  "last_name": "sn",
+  "email": "mail"
+}
+```
+* LDAP User Flags by Group:
+```json
+{
+  "is_superuser": [
+    "cn=admins,cn=groups,cn=accounts,dc=deepthot,dc=aa"
+  ]
+}
+```
 
 https://www.apalrd.net/posts/2023/pve_cloud/ has a great little script that installs images for some of the more popular operating systems and then makes them into a template.  
 
@@ -432,6 +466,7 @@ ToDo: here are the things I want to do.  I'm putting them here to keep from gett
 1. zfs
 1. cloudflare
 1. k8s
+1. learn cloudinit
 1. plex
 1. mastodon
 1. other fediverse things
