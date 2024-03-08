@@ -445,6 +445,29 @@ EOF
 }
 ```
 
+# Set-up deepthot
+
+1. [Spin up AWX on a single k3s c/w vm](#awx-first-stage)
+2. Create playbook for setting up basic machines
+1. Create playbook for IPA machines
+1. gitlab
+1. Playbook for Docker machines
+1. Truenas and S3
+1. vault hashicorp
+1. Get plex up on a server
+1. Get torrent up on a server
+1. Get mail server up
+1. Get mastodon up
+1. Redo DNS and switch to cloudflare
+1. Set up vlans
+1. Bring up a real cluster
+1. Migrate things over
+
+## AWX First Stage
+
+I've done this several times already.  This time do it for real and replace the old AWX machine with the new one.  With an ansible playbook.
+
+
 https://www.apalrd.net/posts/2023/pve_cloud/ has a great little script that installs images for some of the more popular operating systems and then makes them into a template.  
 
 I'm having a ton of grief installing rocky 9.  It took for friggin ever on the big machine.  I think it's *really* friggen slow.  Not entirely sure why.
