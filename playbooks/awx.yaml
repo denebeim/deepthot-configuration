@@ -1,0 +1,29 @@
+---
+# This playbook deploys awx on a single node k3s instance
+
+- name: install awx
+  hosts: awx
+  collections:
+    - community.general
+  become: true
+  remote_user: root
+  vars:
+
+#  tasks:
+#    - include_vars:
+#        dir: inventory/vars/all
+
+  tasks:
+    - name: Create a new VM with Minimal Options
+      community.general.proxmox_kvm:
+        api_user: root@pam
+        api_password: !vault |
+                      $ANSIBLE_VAULT;1.1;AES256
+                      61353761303538356539616237633233623737333130643965303862623332376463343861656338
+                      3935313166613061333736643835393334623765656438650a626233653436643561643262613362
+                      66333539353532313863383536633532623637643835303530636635613634313735373062343866
+                      3538363464343836650a623664656465366234373130663864663936653963653936313662316135
+                      3364
+        api_host: eddie
+        name: awx-host
+        node: eddie
