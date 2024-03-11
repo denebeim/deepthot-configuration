@@ -1,9 +1,0 @@
-- name: restart on change
-  community.general.proxmox_kvm: 
-    api_host: "{{api_host}}"
-    api_user: "{{api_user}}"
-    api_password: "{{api_password}}"
-    name: "{{vmname}}"
-    timeout: 300
-    force: true
-    state: restarted

@@ -1,11 +1,5 @@
 ---
 
-- name: Wait on reboot
-  ansible.builtin.wait_for:
-    delay: 120
-    timeout: 500
-    port: 22
-
 - name: install required packages
   apt:
     state: present

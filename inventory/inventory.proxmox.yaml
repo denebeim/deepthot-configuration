@@ -8,4 +8,6 @@ compose:
 keyed_groups:
   - key: proxmox_tags_parsed
     separator: ""
-    prefix: "group_"
+    prefix: "tag_"
+groups:
+  master: "'master' in (proxmox_tags_parsed|list)"

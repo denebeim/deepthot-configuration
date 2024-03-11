@@ -5,18 +5,32 @@
         api_password: "{{api_password}}"
         name: "{{vmname}}"
         newid: "{{ omit if newid is not defined else newid }}"
-        memory: "{{ omit if memory is not defined else memory }}"
-        cores: "{{ omit if cores is not defined else cores }}"
         format: "qcow2"
         node: "{{ api_host }}"
         clone: "{{clone}}"
         full: true
-        boot: "order=scsi0,net0"
-        ostype: "l26"
         timeout: 600
-        autostart: "{{autostart}}"
         state: present
-      # notify: restart on change
+
+    - name: Reconfigure Machine
+      community.general.proxmox_kvm:
+        update: true
+        api_host: "{{api_host}}"
+        api_user: "{{api_user}}"
+        api_password: "{{api_password}}"
+        name: "{{vmname}}"
+        vmid: "{{newid}}"
+        node: "{{api_host}}"
+        memory: "{{ omit if memory is not defined else memory }}"
+        cores: "{{ omit if cores is not defined else cores }}"
+        tags: 
+          - master
+          - tag_server
+          - tag_ipa
+          - tag_client
+        boot: "order=scsi0"
+        ostype: "l26"
+        autostart: "{{autostart}}"
 
     - name: Resize Disk
       community.general.proxmox_disk:
@@ -27,7 +41,6 @@
         state: resized
         disk: scsi0
         size: "{{size}}"
-      # notify: restart on change
 
     - name: Spin up VM
       community.general.proxmox_kvm:
@@ -36,6 +49,8 @@
         api_password: "{{api_password}}"
         name: "{{vmname}}"
         state: started
-    
+
+    - wait_for: host="{{vmname}}" port=22 delay=10  timeout=300
+  
     - name: Refresh inventory
       ansible.builtin.meta: refresh_inventory
