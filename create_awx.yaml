@@ -11,6 +11,15 @@
     newid: 300
     memory: 8192
     cores: 4
+    size: 20G
 
   roles:
     - proxmox/create_vm
+
+- hosts: "awx-host"
+  remote_user: ansible
+  become: true
+  gather_facts: yes
+
+  roles:
+    - machines/common

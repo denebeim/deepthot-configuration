@@ -1,8 +1,10 @@
----
 # configure a VM that has been created on esx
 
 #- name: reconfigure apt sources
 #  include_tasks: apt_sources.yaml
+
+- name: Set up repository
+  include_tasks: apt_sources.yaml
 
 - name: upgrade packages
   apt:
@@ -10,46 +12,6 @@
     state: present
     update_cache: yes
     upgrade: dist
-
-- name: install required packages
-  apt:
-    state: present
-    package:
-      - emacs-nox
-      - freeipa-client
-      - autofs
-      - nfs-kernel-server
-      - direnv
-      - qemu-guest-agent
-
-- name: edit nsswitch to allow sss to access automount
-  lineinfile:
-    path: /etc/nsswitch.conf
-    regexp: 'automount:'
-    line: "automount:\tfiles sss"
-
-- hostname:
-    name: "{{ ansible_hostname }}.deepthot.aa"
-    use: systemd
-
-- timezone:
-    name: America/Phoenix
-  register: timezone
-
-- name: restart cron
-  systemd:
-    name: cron
-    daemon_reload: true
-    enabled: true
-    state: restarted
-  when: timezone.changed
-
-- name: join domain
-  include_role:
-    name: freeipa.ansible_freeipa.ipaclient
-
-- name: Fix Automount
-  include_tasks: fix_automount.yaml
 
 - name: Reboot if Needed
   include_tasks: reboot_if_needed.yaml

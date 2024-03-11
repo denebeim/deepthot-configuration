@@ -4,5 +4,6 @@
     api_user: "{{api_user}}"
     api_password: "{{api_password}}"
     name: "{{vmname}}"
+    timeout: 300
     force: true
     state: restarted
