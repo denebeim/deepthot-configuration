@@ -12,7 +12,10 @@
     memory: 8192
     cores: 4
     size: 20G
-    
+    tags:
+      - awx
+      - ipa
+  
   roles:
     - proxmox/create_vm
 

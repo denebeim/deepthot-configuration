@@ -23,11 +23,7 @@
         node: "{{api_host}}"
         memory: "{{ omit if memory is not defined else memory }}"
         cores: "{{ omit if cores is not defined else cores }}"
-        tags: 
-          - master
-          - tag_server
-          - tag_ipa
-          - tag_client
+        tags: "{{ omit if tags is not defined else tags }}"
         boot: "order=scsi0"
         ostype: "l26"
         autostart: "{{autostart}}"
