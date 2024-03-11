@@ -1,0 +1,16 @@
+---
+
+- hosts: "pve"
+  remote_user: root
+  gather_facts: no
+
+  vars:
+    clone: ubuntu-cloud
+    api_host: pve
+    vmname: awx-host
+    newid: 300
+    memory: 8192
+    cores: 4
+
+  roles:
+    - proxmox/create_vm

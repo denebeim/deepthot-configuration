@@ -163,6 +163,8 @@ So, 'blueray' the machine that has the blueray and all of the usb backup drives 
 
 Note to self: one of the main things that was keeping me from working yesterday is the machine blueray had 8 cores.  It's only powered up when it's doing things like ripping dvds or backing up onto the external drives.
 
+Note: If you make a ZFS filesystem, then delete it, the ZFS partitions will remain on the disks.  This causes them not to be found if you start the zfs allocator again.  This is proxmox, not trunas
+
 That's where I am now.  What I'm going to do next is to snapshot the machine.  Boot it and see if it's working.  It won't work completely because it's now running on the hp where the usb drives are not.  I may have to boot it in rescue mode and edit /etc/fstab to remove the usb drives.  Anyway, see if it boots.  When it does, install qemu-guest-agent, take another snapshot.  Then upgrade the ubuntu to 22.04, might have to do 20.04 first.  It's on 18.04 which is unsupported nowadays.
 
 Oy vey... I'm getting a lot of grief from cloud-init, I think I better learn it.  Anyway, blueray is doneish.  It will need to be reconfigured after it is placed on the supermicro.
