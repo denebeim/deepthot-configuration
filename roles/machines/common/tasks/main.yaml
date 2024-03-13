@@ -3,8 +3,8 @@
 #- name: reconfigure apt sources
 #  include_tasks: apt_sources.yaml
 
-- name: Set up repository
-  include_tasks: apt_sources.yaml
+#- name: Set up repository
+#  include_tasks: apt_sources.yaml
 
 - name: upgrade packages
   apt:

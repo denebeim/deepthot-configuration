@@ -2,7 +2,7 @@
 
 - hosts: "pve"
   remote_user: root
-  gather_facts: no
+  gather_facts: yes
 
   vars:
     clone: ubuntu-cloud
@@ -12,7 +12,7 @@
     memory: 8192
     cores: 4
     size: 20G
-    tags:
+    mytags:
       - awx
       - ipa
   

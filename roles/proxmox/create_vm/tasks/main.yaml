@@ -19,11 +19,11 @@
         api_user: "{{api_user}}"
         api_password: "{{api_password}}"
         name: "{{vmname}}"
-        vmid: "{{newid}}"
+        vmid: "{{omit if newid is not defined else newid}}"
         node: "{{api_host}}"
         memory: "{{ omit if memory is not defined else memory }}"
         cores: "{{ omit if cores is not defined else cores }}"
-        tags: "{{ omit if tags is not defined else tags }}"
+        tags: "{{ omit if mytags is not defined else mytags }}"
         boot: "order=scsi0"
         ostype: "l26"
         autostart: "{{autostart}}"
@@ -47,6 +47,7 @@
         state: started
 
     - wait_for: host="{{vmname}}" port=22 delay=10  timeout=300
+      name: Wait for SSH
   
     - name: Refresh inventory
       ansible.builtin.meta: refresh_inventory

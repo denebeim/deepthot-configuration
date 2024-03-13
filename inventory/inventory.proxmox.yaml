@@ -9,5 +9,5 @@ keyed_groups:
   - key: proxmox_tags_parsed
     separator: ""
     prefix: "tag_"
-groups:
-  master: "'master' in (proxmox_tags_parsed|list)"
+cache: true
+cache_plugin: memory
