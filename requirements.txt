@@ -3,3 +3,4 @@ requests >= 1.1.0
 ansible-core
 proxmoxer
 netaddr
+kubernetes

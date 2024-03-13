@@ -27,6 +27,7 @@
         boot: "order=scsi0"
         ostype: "l26"
         autostart: "{{autostart}}"
+      changed_when: false
 
     - name: Resize Disk
       community.general.proxmox_disk:
@@ -47,7 +48,7 @@
         state: started
 
     - wait_for: host="{{vmname}}" port=22 delay=10  timeout=300
-      name: Wait for SSH
+      name: Wait for system to be stable
   
     - name: Refresh inventory
       ansible.builtin.meta: refresh_inventory

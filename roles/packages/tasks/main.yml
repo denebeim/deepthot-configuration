@@ -1,0 +1,19 @@
+---
+# Add/Update Packages.  Pass a list of packages if you want to install new packages, otherwise it just does an upgrade.
+
+- name: Install packages if needed
+  ansible.builtin.apt:
+    lock_timeout: 120
+    package: "{{ package }}"
+  when: package is defined
+
+- name: Packages in Correct State
+  ansible.builtin.apt:
+    autoclean: true
+    autoremove: true 
+    state: latest
+    update_cache: true 
+    upgrade: "dist"
+
+- name: Reboot if Needed
+  include_tasks: reboot_if_needed.yaml

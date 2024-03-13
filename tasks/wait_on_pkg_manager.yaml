@@ -1,0 +1,3 @@
+- name: Wait for automatic system updates
+  become: yes
+  shell: while sudo fuser -s /var/lib/dpkg/lock-frontend; do sleep 1; done;
