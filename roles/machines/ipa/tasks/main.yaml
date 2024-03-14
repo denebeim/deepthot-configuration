@@ -1,12 +1,9 @@
 ---
 
-- name: Wait for automatic system updates
-  become: yes
-  shell: while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 1; done;
-
 - name: install required packages
-  apt:
-    state: present
+  ansible.builtin.include_role: 
+    name: packages
+  vars:
     package:
       - emacs-nox
       - freeipa-client

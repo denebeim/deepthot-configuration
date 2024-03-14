@@ -1,6 +1,9 @@
 ---
 # Add/Update Packages.  Pass a list of packages if you want to install new packages, otherwise it just does an upgrade.
 
+- name: Wait for package manager
+  include_tasks: wait_on_pkg_manager.yaml
+
 - name: Install packages if needed
   ansible.builtin.apt:
     lock_timeout: 120
@@ -13,7 +16,7 @@
     autoremove: true 
     state: latest
     update_cache: true 
-    upgrade: "dist"
+    upgrade: yes
 
 - name: Reboot if Needed
   include_tasks: reboot_if_needed.yaml

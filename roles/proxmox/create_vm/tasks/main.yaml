@@ -49,6 +49,8 @@
 
     - wait_for: host="{{vmname}}" port=22 delay=10  timeout=300
       name: Wait for system to be stable
+      changed_when: false
   
     - name: Refresh inventory
       ansible.builtin.meta: refresh_inventory
+      changed_when: false
