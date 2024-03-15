@@ -1,3 +1,5 @@
+---
+
     - name: Clone template
       community.general.proxmox_kvm:
         api_host: "{{api_host}}"
@@ -47,7 +49,7 @@
         name: "{{vmname}}"
         state: started
 
-    - wait_for: host="{{vmname}}" port=22 delay=10  timeout=300
+    - wait_for: host="{{vmname}}" port=22 delay=10  timeout=600
       name: Wait for system to be stable
       changed_when: false
   

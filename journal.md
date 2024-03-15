@@ -410,7 +410,9 @@ compose:
 keyed_groups:
   - key: proxmox_tags_parsed
     separator: ""
-    prefix: group
+    prefix: "tag_"
+cache: true
+cache_plugin: memory
 EOF
 ```
 

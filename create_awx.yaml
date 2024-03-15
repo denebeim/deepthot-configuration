@@ -1,12 +1,12 @@
 ---
 
-- hosts: "pve"
+- hosts: "eddie"
   remote_user: root
   gather_facts: yes
 
   vars:
     clone: ubuntu-cloud
-    api_host: pve
+    api_host: eddie
     vmname: awx-host
     newid: 300
     memory: 8192
@@ -28,3 +28,5 @@
     - machines/ipa
     - techno_tim.k3s_ansible.download
     - techno_tim.k3s_ansible.k3s_server
+    - deploy_metallb
+
