@@ -365,6 +365,8 @@ and `kubectl -n awx logs -f deployments/awx-operator-controller-manager` is good
 
 This takes a *long* time.  Go off and do something.
 
+NOTE: remember [krew](https://krew.sigs.k8s.io/docs/user-guide/setup/install/) for managing kubectl files 
+
 ### Dynamic Proxmox Inventory
 
   First thing you do after installing awx is to log in and create a project.  That's about half way down the menu.  You'll need a git repository to write your playbooks in.  If you use git instead of http, you'll need to put a credential in.  I ended up adding several credentials just cause I was there.

@@ -2,7 +2,7 @@
 
 - hosts: "eddie"
   remote_user: root
-  gather_facts: yes
+  gather_facts: no
 
   vars:
     clone: ubuntu-cloud
@@ -28,6 +28,7 @@
     - machines/ipa
     - techno_tim.k3s_ansible.download
     - techno_tim.k3s_ansible.k3s_server
-    - gheerlingguy.helm
+    - geerlingguy.helm
     - metallb
+    - install_awx
 

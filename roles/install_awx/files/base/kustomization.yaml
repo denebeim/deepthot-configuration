@@ -20,25 +20,18 @@ secretGenerator:
       - port=5432
       - database=awx
       - username=awx
-      - password=!vault |
-                 $ANSIBLE_VAULT;1.1;AES256
-                 65623133383866343366306138356236333662336333393938636564616162663064613237353162
-                 3537363063666435303733663332613933626532303861640a373930376464633934353937386565
-                 66333963366137383361656564643731633536643638383665316266386261363965623762616266
-                 3365613764356266360a363865396363613134346363343434653038393466333733313764646265
-                 3565
+      - password=smi12les
       - type=managed
 
   - name: awx-admin-password
     type: Opaque
     literals:
-      - password=!vault |
-                 $ANSIBLE_VAULT;1.1;AES256
-                 37393339363331353263616132626335623163316234326134623731336236643064376436353866
-                 3936353832663662626539663737343038333732623139630a663232303165646335636634376332
-                 37623561643237323366626566383435333366323866316637626632353130346163303832626665
-                 3261646139646436390a323336383434656166343131333539663134393137613939303031616461
-                 3731
+      - password=smi12les
+
+  - name: redhat-operators-pull-secret
+    literals:
+      - operator=awx
+
 
   # If you want to specify SECRET_KEY for your AWX manually, uncomment following lines and change the value.
   # Refer AAC documentation for detail about SECRET_KEY.
@@ -49,6 +42,7 @@ secretGenerator:
   #    - secret_key=MySuperSecureSecretKey123!
 
 resources:
+  - github.com/ansible/awx-operator/config/default?ref=2.12.1
   - awx.yaml
 #  - pv.yaml
   - pvc.yaml

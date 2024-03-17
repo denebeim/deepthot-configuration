@@ -20,6 +20,7 @@
     definition: "{{ lookup('kubernetes.core.kustomize', dir='roles/install_awx/files/operator') }}"
     namespace: awx
     wait: true
+    wait_timeout: 600
 
 - name: install awx
   kubernetes.core.k8s:

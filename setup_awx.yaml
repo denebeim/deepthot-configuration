@@ -10,5 +10,5 @@
   gather_facts: no
 
   roles:
-#    - geerlingguy.helm
+    - geerlingguy.helm
     - install_awx
