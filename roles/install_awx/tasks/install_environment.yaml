@@ -9,15 +9,3 @@
   ansible.builtin.package: 
     name: python3-kubernetes
     state: present
-
-- name: create project storage location
-  file:
-    path: /data/projects
-    owner: 1000:0
-    state: "directory"
-
-- name: create database location
-  file:
-    path: /data/postgres-13
-    mode: 755
-    state: "directory"

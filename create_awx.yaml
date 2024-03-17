@@ -9,7 +9,7 @@
     api_host: eddie
     vmname: awx-host
     newid: 300
-    memory: 8192
+    memory: 16384
     cores: 4
     size: 20G
     mytags:
