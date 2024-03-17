@@ -3,5 +3,40 @@
 - name: install environment
   include_tasks: install_environment.yaml
 
-- name: install operator
-  
+- name: copy values files
+  copy:
+    src: files
+    dest: /tmp
+
+- name: install local-path
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', 'files/local-path-storage.yaml') | from_yaml_all }}"
+
+# - name: install operator
+#   kubernetes.core.helm:
+#     chart_ref: "https://github.com/ansible/awx-operator/releases/download/2.13.1/awx-operator-2.13.1.tgz"
+#     values_files: 
+#       - /tmp/files/operator/kustomization.yaml
+#     create_namespace: true
+#     release_name: awx
+#     release_namespace: awx
+#     wait: true
+
+# - name: install awx
+#   kubernetes.core.helm:
+#     chart_ref: "https://github.com/ansible/awx-operator/releases/download/2.13.1/awx-operator-2.13.1.tgz"
+#     values_files: 
+#       - /tmp/files/base/kustomization.yaml
+#     create_namespace: true
+#     release_name: awx
+#     release_namespace: awx
+
+- name: install awx
+  kubernetes.core.helm:
+    chart_ref: "https://github.com/ansible/awx-operator/releases/download/2.13.1/awx-operator-2.13.1.tgz"
+    values_files: 
+      - /tmp/files/kustomization.yaml
+    create_namespace: true
+    release_name: awx
+    release_namespace: awx

@@ -28,5 +28,6 @@
     - machines/ipa
     - techno_tim.k3s_ansible.download
     - techno_tim.k3s_ansible.k3s_server
-    - deploy_metallb
+    - gheerlingguy.helm
+    - metallb
 

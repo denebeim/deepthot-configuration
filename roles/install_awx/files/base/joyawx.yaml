@@ -1,0 +1,12 @@
+---
+apiVersion: awx.ansible.com/v1beta1
+kind: AWX
+metadata:
+  name: awx
+spec:
+  AWX: enabled
+  service_type: clusterip
+  ingress_type: ingress
+  hostname: myawx.deepthot.aa
+
+

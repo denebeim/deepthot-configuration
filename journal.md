@@ -486,9 +486,71 @@ Days into it here, but https://techviewleo.com/install-kubernetes-cluster-using-
 
 I think I've got a good one for installing awx as well, but I believe I must have metallb installed.  (fun, I loved it last time I had k8s up)
 
-
 AWX install, following https://ansible.readthedocs.io/projects/awx-operator/en/latest/installation/basic-install.html and
 https://github.com/kurokobo/awx-on-k3s.git
+
+It's been a couple of weeks.  However I just noticed `Fatal glibc error: CPU does not support x86-64-v2` when I tried to do logs, 
+this is due to the processor type.  Or rather the virtual processor type. I'm going to try mucking about with the processor type in the VM configuration.
+
+Tried:  x86-64-v4 nope, not enuff features.
+        x86-64-v2 works
+        host - exists, so why was I futzing around?  I need to remember to set that all the time.
+
+Well that seems to have worked.  This probably explains the unexplained shutdowns I've noticed in the past.
+yes, but it didn't help with the old problems.  So try another thing...
+
+### Installing awx using OLM
+
+```shell
+# Install latest operator sdk
+
+export ARCH=$(case $(uname -m) in x86_64) echo -n amd64 ;; aarch64) echo -n arm64 ;; *) echo -n $(uname -m) ;; esac)
+export OS=$(uname | awk '{print tolower($0)}')
+export OPERATOR_SDK_DL_URL=https://github.com/operator-framework/operator-sdk/releases/download/v1.34.1
+curl -LO ${OPERATOR_SDK_DL_URL}/operator-sdk_${OS}_${ARCH}
+chmod +x operator-sdk_${OS}_${ARCH} && sudo mv operator-sdk_${OS}_${ARCH} /usr/local/bin/operator-sdk
+```
+
+Install olm into k8s `operator-sdk olm install --timeout 10m` (the default timeout is 2 min and that's not nearly enough for my slow ass machines)
+
+```shell
+# create an operator group
+kubectl apply -f - <<EOF
+kind: OperatorGroup
+apiVersion: operators.coreos.com/v1
+metadata:
+  name: og-single
+  namespace: default
+spec:
+  targetNamespaces:
+  - default
+EOF
+```
+```shell
+# Create a subscription, for instance to the quay operator
+kubectl apply -f - <<EOF
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: quay
+  namespace: default
+spec:
+  channel: stable-3.8
+  installPlanApproval: Automatic
+  name: project-quay
+  source: operatorhubio-catalog
+  sourceNamespace: olm
+  startingCSV: quay-operator.v3.8.1
+EOF
+```
+This, sadly is not working at all.
+
+
+
+
+
+
+
 
 ToDo: here are the things I want to do.  I'm putting them here to keep from getting distracted from them.
 1. rancher

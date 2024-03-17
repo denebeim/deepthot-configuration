@@ -1,0 +1,9 @@
+---
+
+- hosts: "awx-host"
+  remote_user: ansible
+  become: true
+  gather_facts: yes
+
+  roles:
+    - metallb

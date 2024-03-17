@@ -1,0 +1,52 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  # Find the latest tag here: https://github.com/ansible/awx-operator/releases
+  - github.com/ansible/awx-operator/config/default?ref=2.13.1
+  - awx.yaml
+  - pvc.yaml
+
+# Set the image tags to match the git version from above
+images:
+  - name: quay.io/ansible/awx-operator
+    newTag: 2.13.1
+
+# Specify a custom namespace in which to install AWX
+namespace: awx
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+secretGenerator:
+  - name: awx-secret-tls
+    type: kubernetes.io/tls
+    files:
+      - tls.crt
+      - tls.key
+
+  - name: awx-postgres-configuration
+    type: Opaque
+    literals:
+      - host=awx-postgres-13
+      - port=5432
+      - database=awx
+      - username=awx
+      - password=!vault |
+                 $ANSIBLE_VAULT;1.1;AES256
+                 30326338633366663863303238373330633132623363353063643962633363326631656635303334
+                 6565386632393233373535633365653134323732396436370a303461626133316564623563303336
+                 33613730353966613035336561356239626636333963353634343063343935326232653035386264
+                 3961373065363132340a313066616335633939616663653165303632303962666263366530633535
+                 6262
+      - type=managed
+
+  - name: awx-admin-password
+    type: Opaque
+    literals:
+      - password=!vault |
+                 $ANSIBLE_VAULT;1.1;AES256
+                 33653563346664326337623564366332663365333131303464333836633565613539346636653239
+                 6231313937366530633131643135336461323763303734650a363964643463343264316464393534
+                 34346333666531663838356139613735616530386530376333373064643334356234313934643636
+                 6538383536343532330a663138383337333638353531616638663332326636303534363338353764
+                 6537
