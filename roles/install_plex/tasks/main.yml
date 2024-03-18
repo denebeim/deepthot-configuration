@@ -1,0 +1,28 @@
+---
+# tasks file for roles/install_plex
+
+- name: 'Add the Plex apt signing key'
+  become: true
+  apt_key:
+    url: 'https://downloads.plex.tv/plex-keys/PlexSign.key'
+    state: 'present'
+
+- name: 'Add the Plex Ubuntu repo'
+  become: true
+  apt_repository:
+    repo: 'deb https://downloads.plex.tv/repo/deb public main'
+    state: 'present'
+
+- name: 'Install the latest version of Plex Media Server'
+  become: true
+  apt:
+    name: 'plexmediaserver'
+    state: 'latest'
+  notify: 'restart-ansible-role-plex'
+
+- name: 'Start the plexmediaserver daemon'
+  become: true
+  service:
+    name: 'plexmediaserver'
+    state: 'started'
+    enabled: 'yes'

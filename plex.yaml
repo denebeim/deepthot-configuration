@@ -1,0 +1,10 @@
+---
+
+- hosts: "plex"
+  remote_user: root
+  become: true
+  gather_facts: yes
+
+  roles:
+    - machines/ipa
+    - install_plex

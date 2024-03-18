@@ -547,8 +547,11 @@ EOF
 ```
 This, sadly is not working at all.
 
+## Plex
+  I found this blog https://www.derekseaman.com/2023/04/proxmox-plex-lxc-with-alder-lake-transcoding.html
+  which referenced this script bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/plex.sh)"
 
-
+So, I'm using it, we'll see if that works.
 
 
 
