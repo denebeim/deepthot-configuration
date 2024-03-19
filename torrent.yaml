@@ -1,0 +1,30 @@
+---
+# Build a VM and install torrent on it.
+
+- hosts: "eddie"
+  remote_user: root
+  gather_facts: no
+
+  vars:
+    clone: ubuntu-cloud
+    api_host: eddie
+    vmname: torrent
+    newid: 301
+    memory: 4096
+    cores: 2
+    size: 8G
+    mytags:
+      - torrent
+      - ipa
+  
+#  roles:
+#    - proxmox/create_vm
+
+- hosts: torrent
+  remote_user: ansible
+  become: true
+  gather_facts: yes
+
+  roles:
+ #   - machines/ipa
+    - openvpn

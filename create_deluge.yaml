@@ -1,0 +1,19 @@
+---
+
+- hosts: "eddie"
+  remote_user: root
+  gather_facts: no
+
+  vars:
+    api_host: eddie
+    hostname: deluge
+    newid: 300
+    memory: 16384
+    cores: 4
+    disk: h2gt2g:20G
+    mytags:
+      - deluge
+      - ipa
+  
+  roles:
+    - proxmox/create_lxc

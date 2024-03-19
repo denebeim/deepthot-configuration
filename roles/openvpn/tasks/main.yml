@@ -1,0 +1,29 @@
+---
+# tasks file for roles/openvpn
+
+- name: install stuff
+  package:
+    name: "{{item}}"
+    state: present
+  loop:
+    - openvpn
+    - unzip
+
+- name: configure vpn
+  copy:
+    src: files/ch327.conf
+    dest: /etc/openvpn/
+    mode: 600
+
+- name: configure vpn
+  copy:
+    src: files/.login.conf
+    dest: /etc/openvpn/
+    mode: 600
+
+- name: run on boot
+  systemd_service:
+    daemon_reload: true
+    enabled: true 
+    name: openvpn@ch327
+    state: started
