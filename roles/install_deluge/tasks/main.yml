@@ -1,2 +1,76 @@
 ---
 # tasks file for roles/install_deluge
+
+- name: Ensure deluge user has the right uid
+  user:
+    name: debian-deluged
+    group: media@deepthot.aa
+    uid: 118
+    home: /var/lib/deluged
+    shell: /usr/sbin/nologin
+    system: true
+    state: present
+
+- name: Install deluged
+  package:
+    name: "{{item}}"
+    state: present
+  loop:
+    - deluged
+    - deluge-web
+
+- name: Create service files
+  ansible.builtin.copy:
+    content: |
+      [Unit]
+      Description=Deluge Bittorrent Client Daemon
+      After=nfs-client.target
+
+      [Service]
+      Type=simple
+      User=debian-deluged
+      Group=debian-deluged
+      UMask=000
+
+      ExecStart=/usr/bin/"{{item}}" -d
+
+      Restart=on-failure
+
+      # Configures the time to wait before service is stopped forcefully.
+      TimeoutStopSec=300
+
+      [Install]
+      WantedBy=multi-user.target    
+    dest: "/etc/systemd/system/{{item}}.service"
+  loop:
+    - deluged
+    - deluge-web
+
+- name: deluge dir
+  file:
+    mode: 0755
+    owner: debian-deluged
+    path: "~debian-deluged/.config/deluge"
+    state: directory
+
+- name: Copy configuration file
+  copy:
+    src: "{{item}}"
+    dest: "~debian-deluged/.config/deluge"
+    owner: "debian-deluged"
+    mode: '0644'
+    decrypt: true
+  loop:
+    - core.conf
+    - execute.conf
+    - web.conf
+
+- name: Restart Services
+  systemd_service:
+    daemon_reload: true
+    enabled: true
+    name: "{{item}}"
+    state: restarted
+  loop:
+    - deluged
+    - deluge-web

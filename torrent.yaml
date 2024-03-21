@@ -10,15 +10,30 @@
     api_host: eddie
     vmname: torrent
     newid: 301
-    memory: 4096
-    cores: 2
+    memory: 8192
+    cores: 4
     size: 8G
     mytags:
       - torrent
       - ipa
   
-#  roles:
-#    - proxmox/create_vm
+  roles:
+    - proxmox/create_vm
+
+- hosts: torrent
+  remote_user: ansible
+  become: true
+  gather_facts: yes
+
+  tasks:
+    - name: Ensure deluge user has the right uid
+      user:
+        name: debian-deluged
+        uid: 118
+        home: /var/lib/deluged
+        shell: /usr/sbin/nologin
+        system: true
+        state: present
 
 - hosts: torrent
   remote_user: ansible
@@ -26,5 +41,7 @@
   gather_facts: yes
 
   roles:
- #   - machines/ipa
+    - machines/ipa
     - openvpn
+    - install_deluge
+    - filebot

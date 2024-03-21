@@ -1,0 +1,42 @@
+---
+# Install FileBot
+
+- name: get filebot signing key
+  get_url: 
+    url: https://raw.githubusercontent.com/filebot/plugins/master/gpg/maintainer.pub
+    dest: /etc/apt/keyrings/filebot.asc
+    mode: '0644'
+    force: true
+
+- name: filebot deb repository
+  copy:
+    content: "deb [arch=all signed-by=/etc/apt/keyrings/filebot.asc] https://get.filebot.net/deb/ universal main"
+    dest: /etc/apt/sources.list.d/filebot.list
+
+- name: install filebot
+  apt:
+    update_cache: true
+    name: "{{item}}"
+  loop:
+    - filebot
+
+- name: Copy filebot script
+  copy:
+    src: files/deluge-postprocess.sh
+    dest: /usr/local/bin/deluge-postprocess.sh
+    mode: 0755
+
+- name: Create filebot directory
+  file:
+    path: "~debian-deluged/.filebot"
+    state: directory
+    owner: "debian-deluged"
+
+- name: Copy license
+  copy:
+    src: files/license.txt
+    dest: "~debian-deluged/.filebot/license.txt"
+    owner: "debian-deluged"
+    decrypt: true
+
+

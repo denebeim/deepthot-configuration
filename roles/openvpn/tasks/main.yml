@@ -7,7 +7,6 @@
     state: present
   loop:
     - openvpn
-    - unzip
 
 - name: configure vpn
   copy:

@@ -455,6 +455,27 @@ EOF
 }
 ```
 
+## Plex
+  I found this blog https://www.derekseaman.com/2023/04/proxmox-plex-lxc-with-alder-lake-transcoding.html
+  which referenced this script bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/plex.sh)"
+  So, I'm using it, we'll see if that works.  It did work, however I didn't like how it worked, so I did my own.
+
+  It still needs revisiting,
+  1. it needs to be a VM rather than a CT.
+  1. the iommu stuff doesn't seem to be working, so hardware transcode isn't there.
+  1. I used apt-key, this needs to be redone the current way
+  1. I want to configure plex with ansible, but that looks to be a fairly large bit of work, putting it of 'till later.
+  1. The local shows are not configured anymore.  I need to set it up, and of course I'll configure it here.
+
+  It's working pretty well, still speed issues.  I want my old computer back.
+
+## Torrent
+Ansible script that spins up a vm, joins our domain, installs torrent and openvpn, configures them, installs filebot, and configures it.
+
+At this point plex works the same way it did with regards to torrent.  Copy/paste a magnet, it's downloaded, and put into 
+the library correctly.
+
+
 # Set-up deepthot
 
 1. [Spin up AWX on a single k3s c/w vm](#awx-first-stage)
@@ -546,13 +567,6 @@ spec:
 EOF
 ```
 This, sadly is not working at all.
-
-## Plex
-  I found this blog https://www.derekseaman.com/2023/04/proxmox-plex-lxc-with-alder-lake-transcoding.html
-  which referenced this script bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/plex.sh)"
-
-So, I'm using it, we'll see if that works.
-
 
 
 
