@@ -13,6 +13,11 @@
         full: true
         timeout: 600
         state: present
+      register: d
+
+    - name: result of clone
+      debug:
+        var: d
 
     - name: Reconfigure Machine
       community.general.proxmox_kvm:
@@ -23,12 +28,16 @@
         name: "{{vmname}}"
         vmid: "{{omit if newid is not defined else newid}}"
         node: "{{api_host}}"
+        kvm: true
         cpu: "host"
         memory: "{{ omit if memory is not defined else memory }}"
         cores: "{{ omit if cores is not defined else cores }}"
         tags: "{{ omit if mytags is not defined else mytags }}"
-        boot: "order=scsi0"
+        #boot: "order=scsi0"
+        hostpci: "{{omit if hostpci is not defined else hostpci}}"
+        machine: "{{omit if machine is not defined else machine}}"
         ostype: "l26"
+        agent: "yes"
         autostart: "{{autostart}}"
       changed_when: false
 
@@ -39,7 +48,7 @@
         api_password: "{{api_password}}"
         name: "{{vmname}}"
         state: resized
-        disk: scsi0
+        disk: virtio0
         size: "{{size}}"
 
     - name: Spin up VM
@@ -49,9 +58,11 @@
         api_password: "{{api_password}}"
         name: "{{vmname}}"
         state: started
+      register: result
 
-    - wait_for: host="{{vmname}}" port=22 delay=10  timeout=600
+    - wait_for: host="{{vmname}}" port=22 delay=60  timeout=600
       name: Wait for system to be stable
+      when: result is changed
       changed_when: false
   
     - name: Refresh inventory

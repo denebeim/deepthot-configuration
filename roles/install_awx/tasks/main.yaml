@@ -15,23 +15,24 @@
     api_version: v1
     state: present
 
-- name: install operator
-  kubernetes.core.k8s:
-    definition: "{{ lookup('kubernetes.core.kustomize', dir='roles/install_awx/files/operator') }}"
-    namespace: awx
-    wait: true
-    wait_timeout: 600
+# - name: install operator
+#   kubernetes.core.k8s:
+#     definition: "{{ lookup('kubernetes.core.kustomize', dir='roles/install_awx/files/operator') }}"
+#     namespace: awx
+#     wait: true
+#     wait_timeout: 600
 
 - name: install awx
   kubernetes.core.k8s:
     definition: "{{ lookup('kubernetes.core.kustomize', dir='roles/install_awx/files/base') }}"
     namespace: awx
+    wait: true
 
 # - name: install awx
 #   kubernetes.core.helm:
 #     chart_ref: "https://github.com/ansible/awx-operator/releases/download/2.13.1/awx-operator-2.13.1.tgz"
 #     values_files: 
-#       - /tmp/files/kustomization.yaml
+#       - roles/install_awx/files/base/kustomization.yaml
 #     create_namespace: true
 #     release_name: awx
 #     release_namespace: awx

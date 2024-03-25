@@ -1,7 +1,28 @@
 ---
+- hosts: "eddie"
+  remote_user: root
+  gather_facts: no
+
+  vars:
+    clone: ubuntu-cloud
+    api_host: eddie
+    vmname: plex
+    newid: 303
+    memory: 8192
+    cores: 4
+    size: 10G
+    machine: 'q35'
+    # When machine = q35 the cloudinit drive *must not* be on an ide
+    hostpci0:  '{"hostpci":"0000:03:00","pcie":"1"}'
+    mytags:
+      - plex
+      - ipa
+  
+  roles:
+    - proxmox/create_vm
 
 - hosts: "plex"
-  remote_user: root
+  remote_user: ansible
   become: true
   gather_facts: yes
 

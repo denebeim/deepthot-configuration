@@ -28,7 +28,7 @@
     - machines/ipa
     - techno_tim.k3s_ansible.download
     - techno_tim.k3s_ansible.k3s_server
-    - geerlingguy.helm
     - metallb
+    - geerlingguy.helm
     - install_awx
 
