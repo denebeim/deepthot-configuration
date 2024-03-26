@@ -13,11 +13,6 @@
         full: true
         timeout: 600
         state: present
-      register: d
-
-    - name: result of clone
-      debug:
-        var: d
 
     - name: Reconfigure Machine
       community.general.proxmox_kvm:
@@ -36,6 +31,7 @@
         #boot: "order=scsi0"
         hostpci: "{{omit if hostpci is not defined else hostpci}}"
         machine: "{{omit if machine is not defined else machine}}"
+        vga: "std"
         ostype: "l26"
         agent: "yes"
         autostart: "{{autostart}}"
@@ -60,11 +56,10 @@
         state: started
       register: result
 
-    - wait_for: host="{{vmname}}" port=22 delay=60  timeout=600
+    - wait_for: host="{{vmname}}" port=22 delay=60  timeout=300
       name: Wait for system to be stable
       when: result is changed
-      changed_when: false
-  
+
     - name: Refresh inventory
       ansible.builtin.meta: refresh_inventory
       changed_when: false

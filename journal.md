@@ -279,6 +279,11 @@ Now you have k3s cluster.  This is a single node cluster with both controlplane 
 
 ToDo: document how to do separate worker nodes and set up HA.
 
+NOTE: I've run into a snag.  By preference I let my image name be the vm's hostname and when it boots that sets up the DNS.  Well, that's not
+how cloud images work.
+
+
+
 
 ## get new awx up
 

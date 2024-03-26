@@ -1,0 +1,37 @@
+---
+- hosts: "pve"
+  remote_user: root
+  gather_facts: no
+
+  vars:
+    clone: deepthot-image-1
+    api_host: pve
+  
+  tasks:
+    - name: "create nodes"
+      vars:
+        vmname: "{{item.vmname}}"
+        newid: "{{item.newid}}"
+        mytags: "{{item.mytags}}"
+        cores: "{{item.cores}}"
+        memory: "{{item.memory}}"
+        size: "{{item.size}}"
+      ansible.builtin.include_role:
+        name: proxmox/create_vm
+        public: true
+      loop:
+        - {vmname: 'k8s-cont1',newid: 400, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 8G}
+        # - {vmname: 'k8s-cont2',newid: 401, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 8G}
+        # - {vmname: 'k8s-cont3',newid: 402, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 8G}
+        # - {vmname: 'k8s-work1',newid: 405, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G}
+        # - {vmname: 'k8s-work2',newid: 406, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G}
+
+- hosts: "tag_k8s"
+  remote_user: ansible
+  become: true
+  gather_facts: yes 
+
+  roles:
+    - packages
+    - machines/ipa
+    - install_k3s

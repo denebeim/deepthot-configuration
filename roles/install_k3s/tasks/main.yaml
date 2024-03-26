@@ -1,0 +1,13 @@
+---
+
+# Define all_vars to capture all variables (be cautious in production)
+- set_fact:
+    all_vars: "{{ ansible_play_hosts | union(ansible_groups) | 
+                  union(ansible_vars) | 
+                  union(playbook_vars) | 
+                  list(unique) }}"
+
+- name: Debug All Variables
+  debug:
+    var: "{{ item }}"
+  loop: "{{ all_vars }}"
