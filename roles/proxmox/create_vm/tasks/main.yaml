@@ -14,7 +14,7 @@
         timeout: 600
         state: present
 
-    - name: Reconfigure Machine
+    - name: "Reconfigure {{vmname}}"
       community.general.proxmox_kvm:
         update: true
         api_host: "{{api_host}}"
@@ -23,11 +23,14 @@
         name: "{{vmname}}"
         vmid: "{{omit if newid is not defined else newid}}"
         node: "{{api_host}}"
+        ipconfig:
+          ipconfig0: "gw=192.168.42.1,ip=192.168.42.{{newid|int - 250}}/24"
         kvm: true
         cpu: "host"
         memory: "{{ omit if memory is not defined else memory }}"
         cores: "{{ omit if cores is not defined else cores }}"
         tags: "{{ omit if mytags is not defined else mytags }}"
+
         #boot: "order=scsi0"
         hostpci: "{{omit if hostpci is not defined else hostpci}}"
         machine: "{{omit if machine is not defined else machine}}"
@@ -58,6 +61,12 @@
 
     - wait_for: host="{{vmname}}" port=22 delay=60  timeout=300
       name: Wait for system to be stable
+      when: result is changed
+
+    - name: Reboot "{{vmname}}"
+      command: "qm reboot {{newid}}"
+      async: 45
+      poll: 0
       when: result is changed
 
     - name: Refresh inventory

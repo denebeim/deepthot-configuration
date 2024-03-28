@@ -221,67 +221,50 @@ search deepthot.aa deepthot
 
 Came up cleanly, the best place to get blacklists is:  https://firebog.net it has a ton of lists of varying qualities.
 
-## k3s 
+# Set up Deepthot
 
-The only distrobution that I've been successful with is centos stream 8 generic cloud.
-The machine should be at least 4gb ram, 2 cores, and 23gb disk.
+I've spent a ton of time trying to get k3s up the way I want it.  How I want it is for the dhcp to be the source of truth.  I may still do that, but
+having IPs handed out by dhcp just isn't working.  They keep getting released and I can't get the cluster up at all.  So, we're going to just use
+dhcp for non server things.
 
-It takes forever to set up wait for the dns name to appear.
-sheesh it's *always* selinux.  disable it and reboot.
+## MAC addresses
 
-K3s is really easy to set up.  
-```bash
-curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE=644 sh - 
-```
+There are 4 locally administered MAC address ranges.  Bit 2 of the 1st tuple flaggs it as local.  Specifically they are 2,6,A,E.  I'm going to try to use 2, but if there's too many things using it I'll switch to one of the others.  Right now I have:
 
-curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE=644 sh -
+| value | Use         |
+|-------|-------------|
+| 02    | VMs         |
+| 12    | k8s Ingress |
 
-This installs k3s.  The environment variable sets the kubeconfig to readable so the kubectl can simply be run on the machine.
 
-This is really fugly I'm hoping to find a better way.  k3s includes a load balancer which interacts poorly with metallb.  So you need to hack the service file.
 
-```sh
-curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.28.6+k3s2 K3S_KUBECONFIG_MODE=644 sh - 
-sudo sed -i '/server/s/r /r --disable servicelb /' /etc/systemd/system/k3s.service
-sudo systemctl daemon-reload && sudo systemctl restart k3s
-```
-ToDo: find a way to set this in a config file or env variable
+## IP Map
 
-Before you can do pretty much anything you need a way to create ips for ingresses into the system.  I usually choose metallb since it's really simple and works great.  You simply 
+| IP    | Name        | MAC               | Purpose                      |
+|-------|-------------|-------------------|------------------------------|
+| 1     | router      | 48:a9:8a:19:79:f4 | duh                          |
+| 2     | services    | 02:00:00:00:00:01 | dhcp,2ndary ns               |
+| 3     | heartogold  |                   | main host                    |
+| 4     | ipa         | 02:00:00:00:00:02 | dns,kerberos,ldap, automount |
+| 5     | pve         | ec:8e:b5:d7:81:13 | temp host                    |
+| 6     | printer     | 00:80:87:b2:1a:af | duh                          |
+| 7     | h2gt2g      | 00:17:88:4c:de:9e | SAN                          |
+| 8     | eddie       | d0:94:66:0f:cc:86 | New host                     |
+| 20-29 | k8s cluster |                   |                              |
+| 20    | k8s         |                   | shared API                   |
+| 21    | k8s-cont-1  | 12:00:00:00:00:01 | Control Node 1               |
+| 22    | k8s-cont-2  | 12:00:00:00:00:02 | Control Node 2               |
+| 23    | k8s-cont-3  | 12:00:00:00:00:03 | Control Node 3               |
+| 25    | k8s-work-1  | 12:00:00:00:00:01 | Worker Node 1                |
+| 26    | k8s-work-2  | 12:00:00:00:00:02 | Worker Node 2                |
 
-```yaml
-cat >metal.yaml <<EOF
-apiVersion: metallb.io/v1beta1
-kind: IPAddressPool
-metadata:
-  name: first-pool
-  namespace: metallb-system
-spec:
-  addresses:
-  - 192.168.42.200-192.168.42.209
----
-apiVersion: metallb.io/v1beta1
-kind: L2Advertisement
-metadata:
-  name: deepthot
-  namespace: metallb-system
-spec:
-  ipAddressPools:
-  - first-pool
 
-EOF
+I just heard about glass isc dhcp monitor/sorta editor. https://github.com/Akkadius/glass-isc-dhcp  Trying it out sometime.
 
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.3/config/manifests/metallb-native.yaml
-kubectl wait deployment controller -n metallb-system --for condition=Available=True --timeout=120s 
-kubectl apply -f metal.yaml
-```
-Now you have k3s cluster.  This is a single node cluster with both controlplane and workers.  
+## k3s Set Up
 
-ToDo: document how to do separate worker nodes and set up HA.
-
-NOTE: I've run into a snag.  By preference I let my image name be the vm's hostname and when it boots that sets up the DNS.  Well, that's not
-how cloud images work.
-
+Yet another attempt at k3s.  My last sticking point is I just can't get dhcp selected addresses to work.  You can see from the table above
+what I'm thinking of.  I don't think I'll have to muck with dhcp to make this work, just set up the mac,ip,and name.
 
 
 
@@ -481,6 +464,9 @@ At this point plex works the same way it did with regards to torrent.  Copy/past
 the library correctly.
 
 
+
+
+-------------------------------------------------------------------------------------- forget what's below here -------------------------------------
 # Set-up deepthot
 
 1. [Spin up AWX on a single k3s c/w vm](#awx-first-stage)
@@ -596,3 +582,64 @@ ToDo: here are the things I want to do.  I'm putting them here to keep from gett
 1. vlans
 1. move from deepthot.aa to local.deepthot.org or maybe l 'cause it's getting pretty long'
 1. move services to a stand alone raspberry pi
+
+## k3s 
+
+The only distribution that I've been successful with is centos stream 8 generic cloud.
+The machine should be at least 4gb ram, 2 cores, and 23gb disk.
+
+It takes forever to set up wait for the dns name to appear.
+sheesh it's *always* selinux.  disable it and reboot.
+
+K3s is really easy to set up.  
+```bash
+curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE=644 sh - 
+```
+
+curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE=644 sh -
+
+This installs k3s.  The environment variable sets the kubeconfig to readable so the kubectl can simply be run on the machine.
+
+This is really fugly I'm hoping to find a better way.  k3s includes a load balancer which interacts poorly with metallb.  So you need to hack the service file.
+
+```sh
+curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.28.6+k3s2 K3S_KUBECONFIG_MODE=644 sh - 
+sudo sed -i '/server/s/r /r --disable servicelb /' /etc/systemd/system/k3s.service
+sudo systemctl daemon-reload && sudo systemctl restart k3s
+```
+ToDo: find a way to set this in a config file or env variable
+
+Before you can do pretty much anything you need a way to create ips for ingresses into the system.  I usually choose metallb since it's really simple and works great.  You simply 
+
+```yaml
+cat >metal.yaml <<EOF
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: first-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - 192.168.42.200-192.168.42.209
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: deepthot
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - first-pool
+
+EOF
+
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.3/config/manifests/metallb-native.yaml
+kubectl wait deployment controller -n metallb-system --for condition=Available=True --timeout=120s 
+kubectl apply -f metal.yaml
+```
+Now you have k3s cluster.  This is a single node cluster with both controlplane and workers.  
+
+ToDo: document how to do separate worker nodes and set up HA.
+
+NOTE: I've run into a snag.  By preference I let my image name be the vm's hostname and when it boots that sets up the DNS.  Well, that's not
+how cloud images work.

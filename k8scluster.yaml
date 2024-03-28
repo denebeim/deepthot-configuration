@@ -1,11 +1,13 @@
 ---
-- hosts: "pve"
+- hosts: pve
   remote_user: root
   gather_facts: no
+  any_errors_fatal: true
 
   vars:
-    clone: deepthot-image-1
+    clone: deepthot-jammy
     api_host: pve
+    mytoken: "{{lookup('community.general.random_string', special=false)}}"
   
   tasks:
     - name: "create nodes"
@@ -16,22 +18,108 @@
         cores: "{{item.cores}}"
         memory: "{{item.memory}}"
         size: "{{item.size}}"
+        storage: dell-zfs
+
       ansible.builtin.include_role:
         name: proxmox/create_vm
         public: true
       loop:
-        - {vmname: 'k8s-cont1',newid: 400, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 8G}
-        # - {vmname: 'k8s-cont2',newid: 401, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 8G}
-        # - {vmname: 'k8s-cont3',newid: 402, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 8G}
-        # - {vmname: 'k8s-work1',newid: 405, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G}
-        # - {vmname: 'k8s-work2',newid: 406, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G}
+        - {vmname: '{{cluster}}-cont1',newid: 400, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 8G}
+        - {vmname: '{{cluster}}-cont2',newid: 401, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 8G}
+        - {vmname: '{{cluster}}-cont3',newid: 402, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 8G}
+        # - {vmname: '{{cluster}}-work1',newid: 405, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G}
+        # - {vmname: '{{cluster}}-work2',newid: 406, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G}
+        - {vmname: '{{cluster}}-work1',newid: 405, mytags: ['k8s','ipa','worker'], cores: 4, memory: 8192, size: 16G}
+        - {vmname: '{{cluster}}-work2',newid: 406, mytags: ['k8s','ipa','worker'], cores: 4, memory: 8192, size: 16G}
+
+- name: Update packages and join IPA
+  hosts: "tag_k8s"
+  remote_user: ansible
+  become: true
+  gather_facts: yes 
+  any_errors_fatal: true
+  roles:
+    - machines/ipa
 
 - hosts: "tag_k8s"
   remote_user: ansible
   become: true
   gather_facts: yes 
+  name: Prepare nodes
+  any_errors_fatal: true
 
   roles:
-    - packages
-    - machines/ipa
-    - install_k3s
+    - role: techno_tim.k3s_ansible.prereq
+      become: true
+    - role: techno_tim.k3s_ansible.download
+      become: true
+    - role: techno_tim.k3s_ansible.raspberrypi
+      become: true
+    - role: techno_tim.k3s_ansible.k3s_custom_registries
+      become: true
+      when: custom_registries
+
+- name: Setup k3s controllers
+  hosts: tag_control
+  gather_facts: yes
+  become: true
+  any_errors_fatal: true
+  environment: "{{ proxy_env | default({}) }}"
+  roles:
+    - role: techno_tim.k3s_ansible.k3s_server
+      become: true
+
+- name: Setup k3s workers
+  hosts: tag_worker
+  environment: "{{ proxy_env | default({}) }}"
+  any_errors_fatal: true
+  roles:
+    - role: techno_tim.k3s_ansible.k3s_agent
+      become: true
+
+- name: Configure k3s cluster
+  hosts: tag_control
+  environment: "{{ proxy_env | default({}) }}"
+  any_errors_fatal: true
+  roles:
+    - role: techno_tim.k3s_ansible.k3s_server_post
+      become: true
+
+- name: Storing kubeconfig in the playbook directory
+  hosts: tag_control
+  become: true
+  environment: "{{ proxy_env | default({}) }}"
+  tasks:
+    - name: replace with cluster name
+      replace:
+        path: "/etc/rancher/k3s/k3s.yaml"
+        regexp: "(default|127.0.0.1)"
+        replace: "{{cluster}}"
+
+    - name: Copying kubeconfig from {{ hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname'] }}
+      ansible.builtin.fetch:
+        src: "/etc/rancher/k3s/k3s.yaml"
+        dest: ./kubeconfig
+        flat: true
+      when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
+
+- hosts: localhost
+  tasks:
+  - name: Run kubectl config view with merged output (privileged)
+    command: kubectl config view --flatten
+    environment: 
+      KUBECONFIG: "~denebeim/.kube/config:./kubeconfig"
+    register: merged_config
+    become: yes
+
+  - name: Write merged config to a file
+    copy:
+      content: "{{ merged_config.stdout }}"
+      dest: merged_kubeconfig
+      mode: 0600
+
+  - name: Replace existing kubeconfig (optional)
+    copy:
+      dest: ~denebeim/.kube/config
+      src: merged_kubeconfig
+      backup: yes
