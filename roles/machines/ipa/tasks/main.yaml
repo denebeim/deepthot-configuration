@@ -3,6 +3,9 @@
   meta: end_play
   when: "'tag_ipa' not in group_names"
 
+- wait_for: host="{{ansible_hostname}}" port=22 delay=5  timeout=300
+  name: Wait for "{{ansible_hostname}}" to boot
+
 - name: Wait for automatic system updates
   become: yes
   shell: while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 1; done;
@@ -25,6 +28,9 @@
     path: /etc/nsswitch.conf
     regexp: 'automount:'
     line: "automount:\tfiles sss"
+
+- debug:
+    var: ansible_hostname
 
 - hostname:
     name: "{{ ansible_hostname }}.deepthot.aa"

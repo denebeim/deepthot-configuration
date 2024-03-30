@@ -244,7 +244,7 @@ There are 4 locally administered MAC address ranges.  Bit 2 of the 1st tuple fla
 |-------|-------------|-------------------|------------------------------|
 | 1     | router      | 48:a9:8a:19:79:f4 | duh                          |
 | 2     | services    | 02:00:00:00:00:01 | dhcp,2ndary ns               |
-| 3     | heartogold  |                   | main host                    |
+| 3     | heartogold  |                   | main host                    |01
 | 4     | ipa         | 02:00:00:00:00:02 | dns,kerberos,ldap, automount |
 | 5     | pve         | ec:8e:b5:d7:81:13 | temp host                    |
 | 6     | printer     | 00:80:87:b2:1a:af | duh                          |
@@ -252,11 +252,11 @@ There are 4 locally administered MAC address ranges.  Bit 2 of the 1st tuple fla
 | 8     | eddie       | d0:94:66:0f:cc:86 | New host                     |
 | 20-29 | k8s cluster |                   |                              |
 | 20    | k8s         |                   | shared API                   |
-| 21    | k8s-cont-1  | 12:00:00:00:00:01 | Control Node 1               |
-| 22    | k8s-cont-2  | 12:00:00:00:00:02 | Control Node 2               |
-| 23    | k8s-cont-3  | 12:00:00:00:00:03 | Control Node 3               |
-| 25    | k8s-work-1  | 12:00:00:00:00:01 | Worker Node 1                |
-| 26    | k8s-work-2  | 12:00:00:00:00:02 | Worker Node 2                |
+| 21    | k8s-cont-1  | 12:00:00:00:00:21 | Control Node 1               |
+| 22    | k8s-cont-2  | 12:00:00:00:00:22 | Control Node 2               |
+| 23    | k8s-cont-3  | 12:00:00:00:00:23 | Control Node 3               |
+| 25    | k8s-work-1  | 12:00:00:00:00:26 | Worker Node 1                |
+| 26    | k8s-work-2  | 12:00:00:00:00:26 | Worker Node 2                |
 
 
 I just heard about glass isc dhcp monitor/sorta editor. https://github.com/Akkadius/glass-isc-dhcp  Trying it out sometime.

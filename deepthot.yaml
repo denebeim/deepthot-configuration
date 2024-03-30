@@ -1,0 +1,11 @@
+---
+
+- hosts: "tag_ipa"
+  remote_user: ansible
+  become: true
+  gather_facts: yes 
+  name: Join to Deepthot Network
+  any_errors_fatal: true
+
+  roles:
+    - machines/ipa

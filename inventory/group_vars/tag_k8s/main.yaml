@@ -39,7 +39,7 @@ apiserver_endpoint: "{{cluster}}"
 
 # k3s_token is required  masters can talk together securely
 # this token should be alpha numeric only
-k3s_token: "{{mytoken}}"
+k3s_token: "this_should_be_a_better_token"
 
 # The IP on which the node is reachable in the cluster.
 # Here, a sensible default is provided, you can still override
