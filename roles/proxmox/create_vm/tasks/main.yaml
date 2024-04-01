@@ -23,10 +23,12 @@
         name: "{{vmname}}"
         vmid: "{{omit if newid is not defined else newid}}"
         node: "{{api_host}}"
-        net:
-          net0: "virtio={{MAC}}, bridge=vmbr0" # this doesn't seem to be working
+        # net:
+        #   net0: "virtio={{MAC if MAC is defined else 'dhcp'}}, bridge=vmbr0" # this doesn't seem to be working
         ipconfig:
+          # ipconfig0: "{{'gw=192.168.42.1,ip={{IP}}/24' if IP is defined else omit}}"
           ipconfig0: "gw=192.168.42.1,ip={{IP}}/24"
+         
         kvm: true
         cpu: "host"
         memory: "{{ omit if memory is not defined else memory }}"
@@ -76,11 +78,11 @@
     #   name: Wait for system to be stable
     #   when: result is changed
 
-    # - name: Reboot "{{vmname}}"
-    #   command: "qm reboot {{newid}}"
-    #   async: 45
-    #   poll: 0
-    #   when: result is changed
+    - name: Reboot "{{vmname}}"
+      command: "qm reboot {{newid}}"
+      async: 45
+      poll: 0
+      when: result is changed
 
     # - wait_for: host="{{vmname}}" port=22 delay=60  timeout=300
     #   name: Wait for system to be stable

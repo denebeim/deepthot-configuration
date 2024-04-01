@@ -1,3 +1,4 @@
+kubeconfig
 tls.*
 license.txt
 .envrc

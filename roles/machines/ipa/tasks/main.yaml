@@ -8,7 +8,7 @@
 
 - name: Wait for automatic system updates
   become: yes
-  shell: while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 1; done;
+  shell: while sudo fuser /var/lib/dpkg/lock-frontend /var/lib/apt/lists/lock >/dev/null 2>&1; do sleep 1; done;
   changed_when: false
 
 - name: install required packages
@@ -20,6 +20,7 @@
       - freeipa-client
       - autofs
       - nfs-kernel-server
+      - nfs-common
       - direnv
       - qemu-guest-agent
 
@@ -28,9 +29,6 @@
     path: /etc/nsswitch.conf
     regexp: 'automount:'
     line: "automount:\tfiles sss"
-
-- debug:
-    var: ansible_hostname
 
 - hostname:
     name: "{{ ansible_hostname }}.deepthot.aa"

@@ -18,8 +18,8 @@
         memory: "{{item.memory}}"
         size: "{{item.size}}"
         storage: dell-zfs
-        IP: "192.168.42.{{ item.newid|int - 400 + 20 }}"
-        MAC: "12:00:00:00:00:{{ item.newid|int - 400 + 20 }}"
+        IP: 192.168.42.{{ item.newid | int - 400 + 20 }}
+        # MAC: "12:00:00:00:00:{{ item.newid|int - 400 + 20 }}"
 
       ansible.builtin.include_role:
         name: proxmox/create_vm
@@ -30,15 +30,6 @@
         - {vmname: '{{cluster}}-cont3',newid: 403, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 8G}
         - {vmname: '{{cluster}}-work1',newid: 405, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G}
         - {vmname: '{{cluster}}-work2',newid: 406, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G}
-
-# - name: Update packages and join IPA
-#   hosts: "tag_k8s"
-#   remote_user: ansible
-#   become: true
-#   gather_facts: yes 
-#   any_errors_fatal: true
-#   roles:
-#     - machines/ipa
 
 - hosts: "tag_k8s"
   remote_user: ansible

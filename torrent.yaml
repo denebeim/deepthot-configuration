@@ -1,18 +1,18 @@
 ---
 # Build a VM and install torrent on it.
 
-- hosts: "eddie"
+- hosts: "pve"
   remote_user: root
   gather_facts: no
 
   vars:
-    clone: ubuntu-cloud
-    api_host: eddie
+    clone: deepthot-jammy
+    api_host: pve
     vmname: torrent
     newid: 301
     memory: 8192
     cores: 4
-    size: 8G
+    size: 16G
     mytags:
       - torrent
       - ipa
@@ -44,4 +44,4 @@
     - machines/ipa
     - openvpn
     - install_deluge
-    - filebot
+    # - filebot

@@ -1,0 +1,3 @@
+ipaclient_force_join: true
+ipaautomount_location: default
+ipaclient_allow_repair: true

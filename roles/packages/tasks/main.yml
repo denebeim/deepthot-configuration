@@ -1,6 +1,12 @@
 ---
 # Manage Packages. Pass a list of packages to install or leave empty to just update
 
+- name: Wait for automatic system updates
+  become: yes
+  shell: while sudo fuser /var/lib/dpkg/lock-frontend /var/lib/apt/lists/lock >/dev/null 2>&1; do sleep 1; done;
+  changed_when: false
+  when: ansible_os_family == "Debian"
+
 - name: Wait for package manager (distribution specific)
   block:
 
@@ -26,9 +32,9 @@
 - name: Install packages if needed
   become: true  # Assuming root privileges are required
   package:
-    name: "{{ packages }}"
+    name: "{{ package }}"
     state: present
-  when: packages is defined
+  when: package is defined
 
 - name: Packages in Correct State (distribution specific)
   block:
