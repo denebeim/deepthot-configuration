@@ -258,6 +258,8 @@ There are 4 locally administered MAC address ranges.  Bit 2 of the 1st tuple fla
 | 25    | k8s-work-1  | 12:00:00:00:00:26 | Worker Node 1                |
 | 26    | k8s-work-2  | 12:00:00:00:00:26 | Worker Node 2                |
 
+This isn't working.  I've been unable to force the MAC on the VM.  The IP on the other hand works.
+
 
 I just heard about glass isc dhcp monitor/sorta editor. https://github.com/Akkadius/glass-isc-dhcp  Trying it out sometime.
 
@@ -265,6 +267,9 @@ I just heard about glass isc dhcp monitor/sorta editor. https://github.com/Akkad
 
 Yet another attempt at k3s.  My last sticking point is I just can't get dhcp selected addresses to work.  You can see from the table above
 what I'm thinking of.  I don't think I'll have to muck with dhcp to make this work, just set up the mac,ip,and name.
+
+## Traefik & Cert Manager
+https://technotim.live/posts/kube-traefik-cert-manager-le/
 
 
 
