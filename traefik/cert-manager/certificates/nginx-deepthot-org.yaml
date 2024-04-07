@@ -1,0 +1,14 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nginx-deepthot-org
+  namespace: default
+spec:
+  secretName: nginx-deepthot-org-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: nginx.deepthot.org
+  dnsNames:
+  - "nginx.deepthot.org"
