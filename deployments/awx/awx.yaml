@@ -1,0 +1,28 @@
+---
+    apiVersion: awx.ansible.com/v1beta1
+    kind: AWX
+    metadata:
+      name:  awx
+    spec:
+      service_type: nodeport
+      nodeport_port: 30080
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: awx
+  namespace: awx
+  annotations: 
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`awx.local.deepthot.org`)
+      kind: Rule
+      services:
+        - name: awx-service
+          port: 80
+  tls:
+    secretName: deepthot-org-prod-tls

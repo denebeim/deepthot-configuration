@@ -269,8 +269,16 @@ Yet another attempt at k3s.  My last sticking point is I just can't get dhcp sel
 what I'm thinking of.  I don't think I'll have to muck with dhcp to make this work, just set up the mac,ip,and name.
 
 ## Traefik & Cert Manager
-https://technotim.live/posts/kube-traefik-cert-manager-le/
-
+https://technotim.live/posts/kube-traefik-cert-manager-le/  Had to take a few runs at it, but ended up doing exactly what Tim said here.  To deploy it:
+1. cd to traefik directory
+1. helm repo add traefik https://traefik.github.io/charts
+1. helm repo update
+1. helm upgrade -i --namespace=traefik --create-namespace traefik traefik/traefik --values=values.yaml
+1. kubectl apply -f default-headers.yaml
+1. cd to cert-manager directory
+1. helm repo add jetstack https://charts.jetstack.io
+1. helm repo update
+1. helm upgrade -i --namespace=cert-manager --create-namespace cert-manager jetstack/cert-manager --values=values.yaml
 
 
 ## get new awx up
