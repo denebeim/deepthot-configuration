@@ -283,6 +283,58 @@ https://technotim.live/posts/kube-traefik-cert-manager-le/  Had to take a few ru
 
 ## get new awx up
 
+I is very easy to set up AWX on a k8s cluster.  It just takes a couple of files and one command:
+
+```yaml
+mkdir -p awx
+cat <<EOF >awx/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- github.com/ansible/awx-operator/config/default?ref=2.14.0
+- awx.yaml
+
+images:
+- name: quay.io/ansible/awx-operator
+  newTag: 2.14.0
+
+namespace: awx
+EOF
+
+cat <<EOF >awx/awx.yaml
+---
+    apiVersion: awx.ansible.com/v1beta1
+    kind: AWX
+    metadata:
+      name:  awx
+    spec:
+      service_type: nodeport
+      nodeport_port: 30080
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: awx
+  namespace: awx
+  annotations: 
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`awx.local.deepthot.org`)
+      kind: Rule
+      services:
+        - name: awx-service
+          port: 80
+  tls:
+    secretName: deepthot-org-prod-tls
+EOF
+
+kubectl apply -k awx
+```
+
 The next thing to do is to bring up AWX.  The best way I've found is using [kurokobo's](https://github.com/kurokobo/awx-on-k3s) configuration.  I haven't looked in detail to see if there's an easier way, but this one works.  However it only works with rpm distros, rocky, fedora, etc
 
 From their README:

@@ -13,3 +13,4 @@ spec:
   dnsNames:
   - "deepthot.org"
   - "*.deepthot.org"
+  - "*.local.deepthot.org"
