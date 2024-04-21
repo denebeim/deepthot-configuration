@@ -5,4 +5,5 @@ roles:
   - name: nginxinc.nginx_config
   - name: geerlingguy.containerd
   - name: geerlingguy.helm
+  - name: geerlingguy.docker
   

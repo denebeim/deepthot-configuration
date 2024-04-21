@@ -2,8 +2,8 @@
 # Manage Packages. Pass a list of packages to install or leave empty to just update
 
 - name: Wait for automatic system updates
-  become: yes
-  shell: while sudo fuser /var/lib/dpkg/lock-frontend /var/lib/apt/lists/lock >/dev/null 2>&1; do sleep 1; done;
+  become: true
+  shell: while sudo lslocks|grep -qE "/var/lib/dpkg/lock-frontend|/var/lib/apt/lists/lock"; do sleep 1; done;
   changed_when: false
   when: ansible_os_family == "Debian"
 
@@ -27,7 +27,7 @@
       when: ansible_os_family == "Arch"
 
   # Fail if no matching wait task was found for the distribution
-  delegate_facts: no
+  delegate_facts: false
 
 - name: Install packages if needed
   become: true  # Assuming root privileges are required

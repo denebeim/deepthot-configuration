@@ -1,0 +1,53 @@
+---
+
+- hosts: "eddie"
+  remote_user: root
+  gather_facts: no
+
+  vars:
+    clone: ubuntu-cloud
+    api_host: eddie
+    vmname: rancher
+    newid: 215
+    memory: 16384
+    cores: 4
+    size: 20G
+    IP: 192.168.42.129
+    mytags:
+      - rancher
+      - ipa
+  
+  roles:
+   - proxmox/create_vm
+
+- hosts: "rancher"
+  remote_user: ansible
+  become: true
+  gather_facts: yes
+
+  roles:
+    - machines/ipa
+    - machines/pre_docker
+    - geerlinguy.docker
+    # - techno_tim.k3s_ansible.download
+    # - techno_tim.k3s_ansible.k3s_server
+    # - metallb
+    # - geerlingguy.helm
+
+# - name: Storing kubeconfig in the playbook directory
+#   hosts: rancher
+#   become: true
+#   environment: "{{ proxy_env | default({}) }}"
+#   tasks:
+#     - name: replace with cluster name
+#       replace:
+#         path: "/etc/rancher/k3s/k3s.yaml"
+#         regexp: "(default|127.0.0.1)"
+#         replace: "rancher"
+
+#     - name: Copying kubeconfig from {{ hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname'] }}
+#       ansible.builtin.fetch:
+#         src: "/etc/rancher/k3s/k3s.yaml"
+#         dest: ./kubeconfig
+#         flat: true
+#       when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']

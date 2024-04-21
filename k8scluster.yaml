@@ -25,11 +25,14 @@
         name: proxmox/create_vm
         public: true
       loop:
-        - {vmname: '{{cluster}}-cont1',newid: 401, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 8G}
-        - {vmname: '{{cluster}}-cont2',newid: 402, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 8G}
-        - {vmname: '{{cluster}}-cont3',newid: 403, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 8G}
-        - {vmname: '{{cluster}}-work1',newid: 405, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G}
-        - {vmname: '{{cluster}}-work2',newid: 406, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G}
+        # - {vmname: '{{cluster}}-cont1',newid: 401, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 12G}
+        # - {vmname: '{{cluster}}-cont2',newid: 402, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 12G}
+        # - {vmname: '{{cluster}}-cont3',newid: 403, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 12G}
+        # - {vmname: '{{cluster}}-work1',newid: 405, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G}
+        # - {vmname: '{{cluster}}-work2',newid: 406, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G}
+        - {vmname: '{{cluster}}-store1',newid: 411, mytags: ['k8s','ipa','store'], cores: 2, memory: 8192, size: 200G}
+        - {vmname: '{{cluster}}-store2',newid: 412, mytags: ['k8s','ipa','store'], cores: 2, memory: 8192, size: 200G}
+        - {vmname: '{{cluster}}-store3',newid: 413, mytags: ['k8s','ipa','store'], cores: 2, memory: 8192, size: 200G}
 
 - hosts: "tag_k8s"
   remote_user: ansible
@@ -61,7 +64,7 @@
       become: true
 
 - name: Setup k3s workers
-  hosts: tag_worker
+  hosts: tag_worker,tag_store
   environment: "{{ proxy_env | default({}) }}"
   any_errors_fatal: true
   roles:

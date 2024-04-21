@@ -1,0 +1,14 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: deepthot-org
+  namespace: traefik
+spec:
+  secretName: deepthot-org-prod-tls
+  issuerRef:
+    name: deepthot-selfsigned-issuer
+  dnsNames:
+  - "deepthot.org"
+  - "*.deepthot.org"
+  - "*.local.deepthot.org"
