@@ -1,18 +1,19 @@
 ---
 # Build a VM and install torrent on it.
 
-- hosts: "pve"
+- hosts: "eddie"
   remote_user: root
   gather_facts: no
 
   vars:
     clone: deepthot-jammy
-    api_host: pve
+    api_host: eddie
     vmname: torrent
     newid: 301
     memory: 8192
     cores: 4
-    size: 16G
+    size: 32G
+    IP: 192.168.42.131
     mytags:
       - torrent
       - ipa
@@ -45,3 +46,5 @@
     - openvpn
     - install_deluge
     # - filebot
+    - machines/pre_docker
+    - geerlingguy.docker

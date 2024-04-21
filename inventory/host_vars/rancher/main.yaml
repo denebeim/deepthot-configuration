@@ -1,5 +1,5 @@
 ---
-k3s_version: v1.28.8+k3s1
+k3s_version: v1.26.15+k3s1
 # this is the user that has ssh access to these machines
 ansible_user: ansible
 systemd_dir: /etc/systemd/system
@@ -171,9 +171,9 @@ custom_registries_yaml: |
 group_name_master: tag_rancher
 
 docker_version:  "24.0.5"
-kubernetes_master_version:  '1.28.8+k3s1'
-kubernetes_version: 'v1.28.8+k3s1'
-kubernetes_version_kubeadm: '{{ kubernetes_version }}'
+kubernetes_master_version:  '{{k3s_version}}'
+kubernetes_version: '{{k3s_version}}'
+kubernetes_version_kubeadm: '{{ k3s_version }}'
 kubernetes_apt_repo_url:  "http://pkgs.k8s.io/"
 kubernetes_apt_repo_pool:  "kubernetes-xenial"
 kubernetes_kubelet_extra_args:  ""

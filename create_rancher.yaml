@@ -27,27 +27,27 @@
 
   roles:
     - machines/ipa
-    - machines/pre_docker
-    - geerlinguy.docker
-    # - techno_tim.k3s_ansible.download
-    # - techno_tim.k3s_ansible.k3s_server
-    # - metallb
-    # - geerlingguy.helm
+    # - machines/pre_docker
+    # - geerlingguy.docker
+    - techno_tim.k3s_ansible.download
+    - techno_tim.k3s_ansible.k3s_server
+    - metallb
+    - geerlingguy.helm
 
-# - name: Storing kubeconfig in the playbook directory
-#   hosts: rancher
-#   become: true
-#   environment: "{{ proxy_env | default({}) }}"
-#   tasks:
-#     - name: replace with cluster name
-#       replace:
-#         path: "/etc/rancher/k3s/k3s.yaml"
-#         regexp: "(default|127.0.0.1)"
-#         replace: "rancher"
+- name: Storing kubeconfig in the playbook directory
+  hosts: rancher
+  become: true
+  environment: "{{ proxy_env | default({}) }}"
+  tasks:
+    - name: replace with cluster name
+      replace:
+        path: "/etc/rancher/k3s/k3s.yaml"
+        regexp: "(default|127.0.0.1)"
+        replace: "rancher"
 
-#     - name: Copying kubeconfig from {{ hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname'] }}
-#       ansible.builtin.fetch:
-#         src: "/etc/rancher/k3s/k3s.yaml"
-#         dest: ./kubeconfig
-#         flat: true
-#       when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
+    - name: Copying kubeconfig from {{ hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname'] }}
+      ansible.builtin.fetch:
+        src: "/etc/rancher/k3s/k3s.yaml"
+        dest: ./kubeconfig
+        flat: true
+      when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']

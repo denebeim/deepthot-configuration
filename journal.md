@@ -441,6 +441,46 @@ the library correctly.
 
 I've also installed sonarr, radarr, and prowlarr.  These will be revisited when I get them automated.  Plans are to put them all into the k8s cluster.
 
+docker run -d \
+  --name sonarr \
+  -p 8989:8989 \
+  -e PUID=2000 \
+  -e PGID=1847800012 \
+  -e UMASK=002 \
+  -e TZ="America/Phoenix" \
+  -v /media/auto/video/arr/sonarr/config:/config \
+  -v /media/auto/video/arr/sonarr/data:/data \
+  -v /media/auto/video:/media/auto/video \
+  --restart unless-stopped \
+  ghcr.io/hotio/sonarr
+
+docker run -d \
+  --name prowlarr \
+  -p 9696:9696 \
+  -e PUID=2000 \
+  -e PGID=1847800012 \
+  -e UMASK=002 \
+  -e TZ="America/Phoenix" \
+  -v /media/auto/video/arr/prowlarr/config:/config \
+  -v /media/auto/video/arr/prowlarr/data:/data \
+  -v /media/auto/video:/media/auto/video \
+  --restart unless-stopped \
+  ghcr.io/hotio/prowlarr
+
+docker run -d \
+  --name radarr \
+  -p 7878:7878 \
+  -e PUID=2000 \
+  -e PGID=1847800012 \
+  -e UMASK=002 \
+  -e TZ="America/Phoenix" \
+  -v /media/auto/video/arr/radarr/config:/config \
+  -v /media/auto/video/arr/radarr/data:/data \
+  -v /media/auto/video:/media/auto/video \
+  --restart unless-stopped \
+  ghcr.io/hotio/radarr
+
+
 ## Rancher
 I had rancher workingish at one point, I'm going to instead put it on the cluster.
 
