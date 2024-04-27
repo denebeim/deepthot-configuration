@@ -5,9 +5,13 @@
       name:  awx
     spec:
       service_type: clusterip
+      projects_persistence: true
+      # init_postgress_extra_commands: |
+      #   sudo mkdir -p /var/lib/pgsql/data/userdata
+      #   sudo chown -Rc 26 /var/lib/pgsql/data
 
 ---
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: awx
@@ -18,27 +22,28 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host('awx.local.deepthot.org')
+    - match: Host(`awx.local.deepthot.org`)
       kind: Rule
       services:
         - name: awx-service
           port: 80
-  tls:
-    secretName: deepthot-org-prod-tls
+      # middlewares:
+      #   - name: default-headers
+  # tls:
+  #   secretName: deepthot-org-staging-tls
 
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: deepthot-org
-  namespace: awx
-spec:
-  secretName: deepthot-org-prod-tls
-  issuerRef:
-    name: letsencrypt-prod
-    kind: ClusterIssuer
-  commonName: deepthot.org
-  dnsNames:
-  - "deepthot.org"
-  - "*.deepthot.org"
-  - "*.local.deepthot.org"
+# ---
+# apiVersion: cert-manager.io/v1
+# kind: Certificate
+# metadata:
+#   name: deepthot-org
+#   namespace: awx
+# spec:
+#   secretName: deepthot-org-staging-tls
+#   issuerRef:
+#     name: letsencrypt-staging
+#     kind: ClusterIssuer
+#   commonName: deepthot.org
+#   dnsNames:
+#   - "deepthot.org"
+#   - "*.deepthot.org"

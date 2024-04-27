@@ -96,24 +96,3 @@
         dest: ./kubeconfig
         flat: true
       when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
-
-- hosts: localhost
-  tasks:
-  - name: Run kubectl config view with merged output (privileged)
-    command: kubectl config view --flatten
-    environment: 
-      KUBECONFIG: "~denebeim/.kube/config:./kubeconfig"
-    register: merged_config
-    become: yes
-
-  - name: Write merged config to a file
-    copy:
-      content: "{{ merged_config.stdout }}"
-      dest: merged_kubeconfig
-      mode: 0600
-
-  - name: Replace existing kubeconfig (optional)
-    copy:
-      dest: ~denebeim/.kube/config
-      src: merged_kubeconfig
-      backup: yes

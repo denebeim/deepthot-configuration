@@ -322,7 +322,7 @@ EOF
 kubectl apply -k awx
 ```
 
-`watch kubectl -n awx get awx,all,ingress,secrets` is nice to watch the progress.
+`watch kubectl -n awx get awx,all,ingress,secrets,pv,pvc` is nice to watch the progress.
 
 and `kubectl -n awx logs -f deployments/awx-operator-controller-manager` is good for watching what's going on.
 
@@ -480,7 +480,13 @@ docker run -d \
   --restart unless-stopped \
   ghcr.io/hotio/radarr
 
-
+docker run -d \
+  --name=flaresolverr \
+  -p 8191:8191 \
+  -e LOG_LEVEL=info \
+  --restart unless-stopped \
+  ghcr.io/flaresolverr/flaresolverr:latest
+  
 ## Rancher
 I had rancher workingish at one point, I'm going to instead put it on the cluster.
 

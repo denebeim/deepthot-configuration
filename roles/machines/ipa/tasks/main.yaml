@@ -7,7 +7,7 @@
   name: Wait for "{{ansible_hostname}}" to boot
 
 - name: Wait for automatic system updates
-  become: yes
+  become: true
   shell: while sudo fuser /var/lib/dpkg/lock-frontend /var/lib/apt/lists/lock >/dev/null 2>&1; do sleep 1; done;
   changed_when: false
 
