@@ -23,11 +23,11 @@
         name: "{{vmname}}"
         vmid: "{{omit if newid is not defined else newid}}"
         node: "{{api_host}}"
-        # net:
-        #   net0: "virtio={{MAC if MAC is defined else 'dhcp'}}, bridge=vmbr0" # this doesn't seem to be working
+        net:
+          net0: "{{'virtio=dhcp, bridge=vmbr0' if IP is not defined else omit}}"
         ipconfig:
-          # ipconfig0: "{{'gw=192.168.42.1,ip={{IP}}/24' if IP is defined else omit}}"
-          ipconfig0: "gw=192.168.42.1,ip={{IP}}/24"
+          ipconfig0: "{{'ip=dhcp' if IP is not defined else omit}}"
+          #ipconfig0: "gw=192.168.42.1,ip={{IP}}/24"
          
         kvm: true
         cpu: "host"
@@ -79,7 +79,7 @@
     #   when: result is changed
 
     - name: Reboot "{{vmname}}"
-      command: "qm reboot {{newid}}"
+      command: "qm reboot {{vmname}}"
       async: 45
       poll: 0
       when: result is changed
