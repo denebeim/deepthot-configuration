@@ -1,0 +1,38 @@
+---
+- hosts: eddie
+  remote_user: root
+  gather_facts: no
+  any_errors_fatal: true
+
+  vars:
+    clone: deepthot-image-1
+    api_host: eddie
+  
+  tasks:
+    - name: "create nodes"
+      vars:
+        vmname: "{{item.vmname}}"
+        newid: "{{item.newid}}"
+        mytags: "{{item.mytags}}"
+        cores: "{{item.cores}}"
+        memory: "{{item.memory}}"
+        size: "{{item.size}}"
+        storage: "{{item.storage}}"
+        IP: 192.168.42.{{item.newid | int - 400 + 20}}
+        # MAC: "12:00:00:00:00:{{ item.newid|int - 400 + 20 }}"
+
+      ansible.builtin.include_role:
+        name: proxmox/create_vm
+        public: true
+      loop:
+        - {vmname: 'joytest',newid: 420, mytags: ['ipa','new'], cores: 2, memory: 4096, size: 12G, storage: "local-lvm"}
+
+- hosts: "tag_new"
+  remote_user: ansible
+  become: true
+  gather_facts: yes 
+  name: Prepare nodes
+  any_errors_fatal: true
+
+  roles:
+    - machines/ipa

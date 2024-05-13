@@ -1,38 +1,41 @@
----
-- hosts: eddie
-  remote_user: root
-  gather_facts: no
-  any_errors_fatal: true
+# ---
+# - hosts: eddie
+#   remote_user: root
+#   gather_facts: no
+#   any_errors_fatal: true
 
-  vars:
-    clone: deepthot-image-1
-    api_host: eddie
+#   vars:
+#     clone: deepthot-image-1
+#     api_host: eddie
   
-  tasks:
-    - name: "create nodes"
-      vars:
-        vmname: "{{item.vmname}}"
-        newid: "{{item.newid}}"
-        mytags: "{{item.mytags}}"
-        cores: "{{item.cores}}"
-        memory: "{{item.memory}}"
-        size: "{{item.size}}"
-        storage: "{{item.storage}}"
-        IP: 192.168.42.{{ item.newid | int - 400 + 20 }}
-        # MAC: "12:00:00:00:00:{{ item.newid|int - 400 + 20 }}"
+#   tasks:
+#     - name: "create nodes"
+#       vars:
+#         vmname: "{{item.vmname}}"
+#         newid: "{{item.newid}}"
+#         mytags: "{{item.mytags}}"
+#         cores: "{{item.cores}}"
+#         memory: "{{item.memory}}"
+#         size: "{{item.size}}"
+#         storage: "{{item.storage}}"
+#         IP: 192.168.42.{{ item.newid | int - 400 + 20 }}
+#         # MAC: "12:00:00:00:00:{{ item.newid|int - 400 + 20 }}"
 
-      ansible.builtin.include_role:
-        name: proxmox/create_vm
-        public: true
-      loop:
-        - {vmname: '{{cluster}}-cont1',newid: 401, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 12G, storage: "local-lvm"}
-        - {vmname: '{{cluster}}-cont2',newid: 402, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 12G, storage: "local-lvm"}
-        - {vmname: '{{cluster}}-cont3',newid: 403, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 12G, storage: "local-lvm"}
-        - {vmname: '{{cluster}}-work1',newid: 405, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G, storage: local-lvm}
-        - {vmname: '{{cluster}}-work2',newid: 406, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G, storage: local-lvm}
-        - {vmname: '{{cluster}}-store1',newid: 411, mytags: ['k8s','ipa','store'], cores: 2, memory: 8192, size: 200G, storage: dell-zfs}
-        - {vmname: '{{cluster}}-store2',newid: 412, mytags: ['k8s','ipa','store'], cores: 2, memory: 8192, size: 200G, storage: dell-zfs}
-        - {vmname: '{{cluster}}-store3',newid: 413, mytags: ['k8s','ipa','store'], cores: 2, memory: 8192, size: 200G, storage: dell-zfs}
+#       ansible.builtin.include_role:
+#         name: proxmox/create_vm
+#         public: true
+#       loop:
+#         - {vmname: '{{cluster}}-cont1',newid: 401, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 12G, storage: "local-lvm"}
+#         - {vmname: '{{cluster}}-cont2',newid: 402, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 12G, storage: "local-lvm"}
+#         - {vmname: '{{cluster}}-cont3',newid: 403, mytags: ['k8s','ipa','control'], cores: 2, memory: 4096, size: 12G, storage: "local-lvm"}
+#         - {vmname: '{{cluster}}-work1',newid: 405, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G, storage: local-lvm}
+#         - {vmname: '{{cluster}}-work2',newid: 406, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G, storage: local-lvm}
+#         - {vmname: '{{cluster}}-store1',newid: 411, mytags: ['k8s','ipa','store'], cores: 2, memory: 8192, size: 200G, storage: dell-zfs}
+#         - {vmname: '{{cluster}}-store2',newid: 412, mytags: ['k8s','ipa','store'], cores: 2, memory: 8192, size: 200G, storage: dell-zfs}
+#         - {vmname: '{{cluster}}-store3',newid: 413, mytags: ['k8s','ipa','store'], cores: 2, memory: 8192, size: 200G, storage: dell-zfs}
+#         - {vmname: '{{cluster}}-store4',newid: 414, mytags: ['k8s','ipa','store'], cores: 2, memory: 8192, size: 200G, storage: dell-zfs}
+
+---
 
 - hosts: "tag_k8s"
   remote_user: ansible

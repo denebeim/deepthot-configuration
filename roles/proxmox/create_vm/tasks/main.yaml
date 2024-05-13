@@ -26,8 +26,8 @@
         net:
           net0: "{{'virtio=dhcp, bridge=vmbr0' if IP is not defined else omit}}"
         ipconfig:
-          ipconfig0: "{{'ip=dhcp' if IP is not defined else omit}}"
-          #ipconfig0: "gw=192.168.42.1,ip={{IP}}/24"
+          ipconfig0: "gw=192.168.42.1,ip={{IP}}/24"
+          # ipconfig0: "{{'gw=192.168.42.1,ip=IP/24' if IP is defined else omit}}"
          
         kvm: true
         cpu: "host"

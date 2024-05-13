@@ -1,5 +1,6 @@
 ---
-k3s_version: v1.26.15+k3s1
+k3s_version: v1.28.7+k3s1 
+#k3s_version: v1.26.15+k3s1
 # this is the user that has ssh access to these machines
 ansible_user: ansible
 systemd_dir: /etc/systemd/system
@@ -95,7 +96,7 @@ metal_lb_speaker_tag_version: "v0.14.3"
 metal_lb_controller_tag_version: "v0.14.3"
 
 # metallb ip range for load balancer
-metal_lb_ip_range: "192.168.42.200-192.168.42.200"
+metal_lb_ip_range: "192.168.42.129-192.168.42.129"
 
 # Only enable if your nodes are proxmox LXC nodes, make sure to configure your proxmox nodes
 # in your hosts.ini file.

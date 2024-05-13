@@ -19,3 +19,5 @@ spec:
         selector:
           dnsZones:
             - "deepthot.org"
+            - "*.deepthot.org"
+            - "*.local.deepthot.org"

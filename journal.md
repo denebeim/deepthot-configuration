@@ -315,8 +315,6 @@ spec:
       services:
         - name: awx-service
           port: 80
-  tls:
-    secretName: deepthot-org-prod-tls
 EOF
 
 kubectl apply -k awx
@@ -327,6 +325,9 @@ kubectl apply -k awx
 and `kubectl -n awx logs -f deployments/awx-operator-controller-manager` is good for watching what's going on.
 
 This takes a *long* time.  Go off and do something.
+
+After it's done the admin password can be displayed with `kubectl get secret awx-admin-password -o jsonpath="{.data.password}" | base64 --decode&&echo`  
+
 
 NOTE: remember [krew](https://krew.sigs.k8s.io/docs/user-guide/setup/install/) for managing kubectl files 
 ToDo: document creating traefik and cert-manager
@@ -507,3 +508,8 @@ helm upgrade -i rancher rancher-latest/rancher \
 NOTE: probably should go with the stable release, but we'll try living on the dangerous side for the moment.
 
 OK, it's wanting an older version of k8s.  I'm going to change it to spin up a single node cluster.
+
+`kubectl patch challenge <challenge-name> -p '{"metadata":{"finalizers":null}}' --type=merge`  something like this can  work for about anything in
+kubernetes.  Assuming you can figure out what the target is.
+
+https://k9scli.io/topics/install/ it's awesome haha

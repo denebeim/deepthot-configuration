@@ -27,23 +27,3 @@ spec:
       services:
         - name: awx-service
           port: 80
-      # middlewares:
-      #   - name: default-headers
-  # tls:
-  #   secretName: deepthot-org-staging-tls
-
-# ---
-# apiVersion: cert-manager.io/v1
-# kind: Certificate
-# metadata:
-#   name: deepthot-org
-#   namespace: awx
-# spec:
-#   secretName: deepthot-org-staging-tls
-#   issuerRef:
-#     name: letsencrypt-staging
-#     kind: ClusterIssuer
-#   commonName: deepthot.org
-#   dnsNames:
-#   - "deepthot.org"
-#   - "*.deepthot.org"
