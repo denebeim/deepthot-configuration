@@ -442,6 +442,8 @@ the library correctly.
 
 I've also installed sonarr, radarr, and prowlarr.  These will be revisited when I get them automated.  Plans are to put them all into the k8s cluster.
 
+These are very DB heavy, a local disk is important.
+
 docker run -d \
   --name sonarr \
   -p 8989:8989 \
@@ -449,8 +451,8 @@ docker run -d \
   -e PGID=1847800012 \
   -e UMASK=002 \
   -e TZ="America/Phoenix" \
-  -v /media/auto/video/arr/sonarr/config:/config \
-  -v /media/auto/video/arr/sonarr/data:/data \
+  -v /home/arr/sonarr/config:/config \
+  -v /home/arr/sonarr/data:/data \
   -v /media/auto/video:/media/auto/video \
   --restart unless-stopped \
   ghcr.io/hotio/sonarr
@@ -462,8 +464,8 @@ docker run -d \
   -e PGID=1847800012 \
   -e UMASK=002 \
   -e TZ="America/Phoenix" \
-  -v /media/auto/video/arr/prowlarr/config:/config \
-  -v /media/auto/video/arr/prowlarr/data:/data \
+  -v /home/arr/prowlarr/config:/config \
+  -v /home/arr/prowlarr/data:/data \
   -v /media/auto/video:/media/auto/video \
   --restart unless-stopped \
   ghcr.io/hotio/prowlarr
@@ -475,8 +477,8 @@ docker run -d \
   -e PGID=1847800012 \
   -e UMASK=002 \
   -e TZ="America/Phoenix" \
-  -v /media/auto/video/arr/radarr/config:/config \
-  -v /media/auto/video/arr/radarr/data:/data \
+  -v /home/arr/radarr/config:/config \
+  -v /home/arr/radarr/data:/data \
   -v /media/auto/video:/media/auto/video \
   --restart unless-stopped \
   ghcr.io/hotio/radarr

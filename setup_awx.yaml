@@ -2,7 +2,7 @@
 # This playbook deploys awx on a single node k3s instance
 
 - name: install awx
-  hosts: awx-host
+  hosts: newawx
   collections:
     - community.general
   become: true

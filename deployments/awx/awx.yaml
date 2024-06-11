@@ -27,3 +27,5 @@ spec:
       services:
         - name: awx-service
           port: 80
+  tls:
+    secretName: deepthot-org-prod-tls

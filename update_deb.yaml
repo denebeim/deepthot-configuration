@@ -1,0 +1,9 @@
+---
+
+- name: update packages
+  hosts: proxmox_all_running
+  remote_user: ansible
+  vars:
+
+  roles:
+    - machines/common

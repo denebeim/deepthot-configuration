@@ -8,7 +8,7 @@ com_crashlytics_export_strings
 .vault
 certs/*
 k3s-ansible/*
-
+context
 
 # Created by .ignore support plugin (hsz.mobi)
 
