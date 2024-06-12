@@ -3,6 +3,7 @@
 - name: update packages
   hosts: proxmox_all_running
   remote_user: ansible
+  become: true
   vars:
 
   roles:
