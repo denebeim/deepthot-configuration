@@ -15,7 +15,7 @@
       when: ansible_os_family == "Debian"
 
     - name: Wait for yum (RedHat/CentOS/Fedora)
-      yum: name=dnf-automatic groups=anaconda
+      yum: name=yum groups=anaconda
       when: ansible_os_family == "RedHat"
 
     - name: Wait for dnf (Fedora)
