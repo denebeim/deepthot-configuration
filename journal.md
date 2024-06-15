@@ -447,7 +447,7 @@ These are very DB heavy, a local disk is important.
 docker run -d \
   --name sonarr \
   -p 8989:8989 \
-  -e PUID=2000 \
+  -e PUID=118 \
   -e PGID=1847800012 \
   -e UMASK=002 \
   -e TZ="America/Phoenix" \
@@ -460,7 +460,7 @@ docker run -d \
 docker run -d \
   --name prowlarr \
   -p 9696:9696 \
-  -e PUID=2000 \
+  -e PUID=118 \
   -e PGID=1847800012 \
   -e UMASK=002 \
   -e TZ="America/Phoenix" \
@@ -473,7 +473,7 @@ docker run -d \
 docker run -d \
   --name radarr \
   -p 7878:7878 \
-  -e PUID=2000 \
+  -e PUID=118 \
   -e PGID=1847800012 \
   -e UMASK=002 \
   -e TZ="America/Phoenix" \
