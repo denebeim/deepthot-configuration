@@ -1,0 +1,3 @@
+api_user: "{{ lookup('ansible.builtin.env','PROXMOX_USER')}}"
+api_password: "{{ lookup('ansible.builtin.env','PROXMOX_PASSWORD') }}"
+api_host: eddie
