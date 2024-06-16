@@ -1,0 +1,19 @@
+---
+- hosts: "eddie"
+  remote_user: root
+  gather_facts: yes
+
+  tasks:
+    - debug:
+        msg: "{{ansible_env}}"
+    - community.general.proxmox_kvm:
+        name: "testing"
+        clone: "ubuntu-cloud"
+        api_user: "{{ lookup('ansible.builtin.env','PROXMOX_USER')}}"
+        api_password: "{{ lookup('ansible.builtin.env','PROXMOX_PASSWORD') }}"
+        api_host: eddie
+        node: eddie
+        storage: "dell-zfs"
+        autostart: false
+        timeout: 120
+
