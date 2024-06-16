@@ -1,4 +1,5 @@
 ---
+# Creates singe node k3s cluster for rancher.
 
 - hosts: "eddie"
   remote_user: root

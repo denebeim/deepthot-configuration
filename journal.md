@@ -491,9 +491,14 @@ docker run -d \
   ghcr.io/flaresolverr/flaresolverr:latest
   
 ## Rancher
-I had rancher workingish at one point, I'm going to instead put it on the cluster.
 
 I'm using the [rancher documentation](https://ranchermanager.docs.rancher.com/getting-started/installation-and-upgrade/install-upgrade-on-a-kubernetes-cluster)
+
+First install the single node k3s.  This needs to be called 'rancher' because there is an inventory file with the variables specific to that machine's name.
+
+`ansible-playbook -i inventory/inventory.proxmox.yaml create_rancher.yaml`
+
+There's several things set here, the ip for the cluster is .129, for instance.  Check out the inventory host variables.  
 
 ```bash
 helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
@@ -507,9 +512,8 @@ helm upgrade -i rancher rancher-latest/rancher \
   --set letsEncrypt.email=denebeim+efs@deepthot.org \
   --set letsEncrypt.ingress.class=traefik
 ```
-NOTE: probably should go with the stable release, but we'll try living on the dangerous side for the moment.
 
-OK, it's wanting an older version of k8s.  I'm going to change it to spin up a single node cluster.
+## Notes:
 
 `kubectl patch challenge <challenge-name> -p '{"metadata":{"finalizers":null}}' --type=merge`  something like this can  work for about anything in
 kubernetes.  Assuming you can figure out what the target is.

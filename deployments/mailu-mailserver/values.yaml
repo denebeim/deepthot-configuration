@@ -3,7 +3,7 @@ hostnames:
   - mail.deepthot.org
 initialAccount:
   domain: deepthot.org
-  password: chang3m3!
+  password: "smi12les"
   username: mailadmin
 logLevel: INFO
 limits:
@@ -13,5 +13,4 @@ limits:
   messageSizeLimitInMegabytes: 200
 persistence:
   size: 100Gi
-  storageClass: fast
-secretKey: chang3m3!
+secretKey: "smi12les"
