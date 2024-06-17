@@ -4,9 +4,8 @@
   gather_facts: yes
 
   tasks:
-    - debug:
-        msg: "{{ansible_env}}"
     - community.general.proxmox_kvm:
+        name: "{{vmname}}"
         api_user: "{{ lookup('ansible.builtin.env','PROXMOX_USER')}}"
         api_password: "{{ lookup('ansible.builtin.env','PROXMOX_PASSWORD') }}"
         # api_host: eddie
@@ -14,5 +13,6 @@
         # storage: "dell-zfs"
         autostart: false
         timeout: 120
-        
+        net: "bridge=vmbr0"
+        ipconfig: "gw=192.168.42.1,ip=192.168.42.199/24"        
 
