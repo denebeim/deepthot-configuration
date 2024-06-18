@@ -1,18 +1,35 @@
 ---
 - hosts: "eddie"
   remote_user: root
-  gather_facts: yes
+  # gather_facts: true
+
+  vars:
 
   tasks:
-    - community.general.proxmox_kvm:
-        name: "{{vmname}}"
-        api_user: "{{ lookup('ansible.builtin.env','PROXMOX_USER')}}"
-        api_password: "{{ lookup('ansible.builtin.env','PROXMOX_PASSWORD') }}"
-        # api_host: eddie
-        # node: eddie
-        # storage: "dell-zfs"
-        autostart: false
-        timeout: 120
-        net: "bridge=vmbr0"
-        ipconfig: "gw=192.168.42.1,ip=192.168.42.199/24"        
+    - debug:
+        var: vars
+
+    # - name: Delete old VM
+    #   any_errors_fatal: false
+    #   community.general.proxmox_kvm:
+    #     name: "{{vmname}}"
+    #     api_user: "{{ lookup('ansible.builtin.env','PROXMOX_USER')}}"
+    #     api_password: "{{ lookup('ansible.builtin.env','PROXMOX_PASSWORD') }}"
+    #     api_host: eddie
+    #     state: "absent"
+    #     force: true
+    #     timeout: 120
+    
+    - name: "{{vmname}}"
+      vars:
+        # newid: "{{ omit if newid is not defined else newid }}"
+        # clone: "{{ omit if clone is not defined else clone }}"
+        # IP: "{{ omit if IP is not defined else IP }}"
+
+      ansible.builtin.include_role:
+        name: proxmox/create_vm
+        public: true
+
+    - debug:
+        var: vars
 

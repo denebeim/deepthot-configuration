@@ -2,6 +2,7 @@
     api_password: "{{ lookup('ansible.builtin.env','PROXMOX_PASSWORD') }}"
     api_host: eddie
     storage: h2gt2g-hosts
-    clone: 1001
+    clone: ubuntu-cloud
     size: 8G
     autostart: false
+    domain: "local.deepthot.org"

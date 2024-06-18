@@ -1,4 +1,6 @@
 ---
+    - debug:
+        var: hostvars
 
     - name: Clone template
       community.general.proxmox_kvm:
@@ -11,12 +13,14 @@
         node: "{{ api_host }}"
         clone: "{{clone}}"
         full: true
+        storage: "{{storage}}"
         timeout: 600
         state: present
 
     - name: "Reconfigure {{vmname}}"
       community.general.proxmox_kvm:
         update: true
+        # update_unsafe: true
         api_host: "{{api_host}}"
         api_user: "{{api_user}}"
         api_password: "{{api_password}}"
@@ -24,9 +28,7 @@
         vmid: "{{omit if newid is not defined else newid}}"
         node: "{{api_host}}"
         net:
-          net0: "{{'virtio=dhcp, bridge=vmbr0' if IP is not defined else omit}}"
-        ipconfig:
-          ipconfig0: "gw=192.168.42.1,ip={{IP}}/24"
+          net0: "bridge=vmbr0"
           # ipconfig0: "{{'gw=192.168.42.1,ip={{IP}}/24' if IP is defined else omit}}"
          
         kvm: true
@@ -43,6 +45,19 @@
         agent: "yes"
         autostart: "{{autostart}}"
       changed_when: false
+
+    - name: configureIP
+      community.general.proxmox_kvm:
+        api_host: "{{api_host}}"
+        api_user: "{{api_user}}"
+        api_password: "{{api_password}}"
+        node: "{{api_host}}"
+        name: "{{vmname}}"
+        ipconfig:
+          ipconfig0: "gw=192.168.42.1,ip={{IP}}/24"
+        update_unsafe: true
+        update: true
+      when: IP is defined
 
     - name: Resize Disk
       community.general.proxmox_disk:
@@ -91,3 +106,5 @@
     # - name: Refresh inventory
     #   ansible.builtin.meta: refresh_inventory
     #   changed_when: false
+    - debug:
+       var: vars
