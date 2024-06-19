@@ -88,23 +88,3 @@
         ipa_pass: "{{ipaadmin_password}}"
       when: IP is defined
       delegate_to: "ipa"
-
-    # - wait_for: host="{{vmname}}" port=22 delay=60  timeout=300
-    #   name: Wait for system to be stable
-    #   when: result is changed
-
-    - name: Reboot "{{vmname}}"
-      command: "qm reboot {{vmname}}"
-      async: 45
-      poll: 0
-      when: result is changed
-
-    # - wait_for: host="{{vmname}}" port=22 delay=60  timeout=300
-    #   name: Wait for system to be stable
-    #   when: result is changed
-
-    # - name: Refresh inventory
-    #   ansible.builtin.meta: refresh_inventory
-    #   changed_when: false
-    - debug:
-       var: vars

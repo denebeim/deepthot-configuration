@@ -1,36 +1,18 @@
 ---
 - hosts: "eddie"
   remote_user: root
-  gather_facts: false
+  gather_facts: no
 
   vars:
 
   tasks:
-    - debug:
-        var: vars
-
-    # - name: Delete old VM
-    #   any_errors_fatal: false
-    #   community.general.proxmox_kvm:
-    #     name: "{{vmname}}"
-    #     api_user: "{{ lookup('ansible.builtin.env','PROXMOX_USER')}}"
-    #     api_password: "{{ lookup('ansible.builtin.env','PROXMOX_PASSWORD') }}"
-    #     api_host: eddie
-    #     state: "absent"
-    #     force: true
-    #     timeout: 120
     
     - name: "{{vmname}}"
-      vars:
-        # newid: "{{ newid | omit }}"
-        # newid: "{{ omit if newid is not defined else newid }}"
-        # clone: "{{ omit if clone is not defined else clone }}"
-        # IP: "{{ omit if IP is not defined else IP }}"
-
       ansible.builtin.include_role:
         name: proxmox/create_vm
         public: true
 
-    - debug:
-        var: vars
-
+# I still have not figured out how to tell when the VM is up and stable.
+# The first time it initializes it's named 'ubuntu', I haven't been reliably 
+# able to fix that either and reboot the machine.
+# For right now, I'm going to use 2 ansible playbooks for this.
