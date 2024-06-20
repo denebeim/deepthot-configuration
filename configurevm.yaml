@@ -1,0 +1,14 @@
+---
+# configures a VM using tags already assigned.
+# it is for configuring one machine rather than many.
+
+- hosts: "{{vmname}}"
+  remote_user: ansible
+  become: true
+  gather_facts: true
+
+  roles:
+    - role: packages
+    - role: machines/ipa
+    - role: machines/docker
+

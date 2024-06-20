@@ -1,7 +1,4 @@
 ---
-    - debug:
-        var: hostvars
-
     - name: Clone template
       community.general.proxmox_kvm:
         api_host: "{{api_host}}"
@@ -78,6 +75,8 @@
         state: started
       register: result
 
+    - debug:
+        var: ipaadmin_password
     - name: Create DNS record
       community.general.ipa_dnsrecord:
         record_name: "{{vmname}}"

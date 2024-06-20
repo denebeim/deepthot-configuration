@@ -16,3 +16,16 @@
 # The first time it initializes it's named 'ubuntu', I haven't been reliably 
 # able to fix that either and reboot the machine.
 # For right now, I'm going to use 2 ansible playbooks for this.
+
+
+
+vmname: dmz
+newid: 304
+storage: dell-zfs
+api_host: eddie
+clone: ubuntu-cloud
+size: 4G
+memory: 2048
+cores: 1
+IP: 192.168.42.15
+
