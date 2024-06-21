@@ -83,6 +83,7 @@
         record_type: "A"
         record_value: "{{IP}}"
         zone_name: "{{domain}}"
+        ipa_host: "ipa"
         ipa_user: "admin"
         ipa_pass: "{{ipaadmin_password}}"
       when: IP is defined
