@@ -84,6 +84,6 @@
         record_value: "{{IP}}"
         zone_name: "{{domain}}"
         ipa_user: "admin"
-        ipa_pass: "{{ipaadmin_password}}"
+        ipaadmin_password: "{{ipaadmin_password}}"
       when: IP is defined
       delegate_to: "ipa"
