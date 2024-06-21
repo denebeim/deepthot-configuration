@@ -75,8 +75,6 @@
         state: started
       register: result
 
-    - debug:
-        var: ipaadmin_password
     - name: Create DNS record
       community.general.ipa_dnsrecord:
         record_name: "{{vmname}}"
@@ -86,12 +84,5 @@
         ipa_host: "ipa"
         ipa_user: "admin"
         ipa_pass: "{{ipaadmin_password}}"
+        validate_certs: false
       when: IP is defined
-      vars:
-       ansible_password: "!vault |
-                          $ANSIBLE_VAULT;1.1;AES256
-                          35646265373633313434643433353139373065393162323966303939623261326361636237663362
-                          3761646466383734616231346163353732383861373766310a653437343038623963623036663234
-                          38616331323539353463656565386164643336383939346434663764663231346137663932333831
-                          3932313035373739330a333362323233346435663762613432323165663331643232643932333032
-                          3430"
