@@ -87,7 +87,6 @@
         ipa_user: "admin"
         ipa_pass: "{{ipaadmin_password}}"
       when: IP is defined
-      delegate_to: "ipa"
       vars:
        ansible_password: "!vault |
                           $ANSIBLE_VAULT;1.1;AES256
