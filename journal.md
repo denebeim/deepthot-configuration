@@ -513,7 +513,28 @@ helm upgrade -i rancher rancher-latest/rancher \
   --set letsEncrypt.ingress.class=traefik
 ```
 
-## Notes:
+# VPN
+
+## Wireguard
+
+Hopefully a quick hack here.  I'm trying out [wg-easy](https://github.com/wg-easy/) It looks easy peasy.  I'm starting out with a small vm with only docker installed.  This is my dmz, I'm hoping what I'm trying here is really good from a security pov.  Namely it only has the ability to log into with ssh certs, of which there are no private key pairs on the machine.  It all has to be done with an agent.
+
+Now that I think of it, I'm wondering if I'm even going to need this with wireguard.  Set up the VPN and see everything.  Dunno.  Let's try.
+
+Setting up wg-easy:
+  copy the deployments/wg-easy/docker-compose.yaml to somewhere on the dmz
+  cd to that directory
+  docker compose up -d
+
+Client:
+  apt install wireguard resolvconf
+  create connection on http://dmz:51821
+  download config
+  sudo mv ~/Downloads/benjymouse.conf /etc/wireguard/deepthot.conf
+  sudo wg-quick up deepthot
+
+
+# Notes:
 
 `kubectl patch challenge <challenge-name> -p '{"metadata":{"finalizers":null}}' --type=merge`  something like this can  work for about anything in
 kubernetes.  Assuming you can figure out what the target is.
