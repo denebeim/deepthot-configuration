@@ -81,8 +81,9 @@
         record_type: "A"
         record_value: "{{IP}}"
         zone_name: "{{domain}}"
-        ipa_host: "ipa"
+        # ipa_host: "ipa"
         ipa_user: "admin"
         ipa_pass: "{{ipaadmin_password}}"
         validate_certs: false
       when: IP is defined
+      delegate_to: ipa

@@ -9,6 +9,10 @@
 
   roles:
     - role: packages
+      vars:
+        - package: "qemu-guest-agent"
     - role: machines/ipa
+      when: "'tag_ipa' in group_names"
     - role: machines/docker
+      when: "'tag_docker' in group_names"
 
