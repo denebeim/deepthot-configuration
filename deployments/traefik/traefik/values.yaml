@@ -25,21 +25,9 @@ ports:
   websecure:
     tls:
       enabled: true
-      
 ingressRoute:
   dashboard:
     enabled: true
-
-routers:
-  to-rancher:
-    rule: "Host('rancher.local.deepthot.org')"
-    service: rancher
-
-services:
-  rancher:
-    loadBalancer:
-      servers:
-        - url: http://rancher.deepthot.aa
 
 providers:
   kubernetesCRD:
@@ -65,3 +53,7 @@ service:
   loadBalancerSourceRanges: []
   externalIPs: []
 
+tlsStore:
+  default:
+    defaultCertificate:
+      secretName: deepthot-org-prod-tls

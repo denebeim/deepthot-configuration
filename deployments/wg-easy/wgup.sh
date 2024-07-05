@@ -2,7 +2,7 @@
 
 sudo wg-quick up deepthot
 sudo resolvconf -a deepthot <<EOF
-nameserver 192.168.42.2
 nameserver 192.168.42.4
-search deepthot.aa local.deepthot.org deepthot.org
+nameserver 192.168.42.2
+search local.deepthot.org deepthot.aa deepthot.org
 EOF

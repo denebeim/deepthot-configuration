@@ -15,12 +15,5 @@ spec:
       services:
         - name: nginx
           port: 80
-    - match: Host(`www.nginx.deepthot.org`)
-      kind: Rule
-      services:
-        - name: nginx
-          port: 80
-      middlewares:
-        - name: default-headers
-  tls:
-    secretName: deepthot-org-prod-tls
+  # tls:
+  #   secretName: deepthot-org-prod-tls
