@@ -1,0 +1,24 @@
+domain: mailu.local.deepthot.org
+hostnames:
+  - mail.deepthot.org
+  - smtp.deepthot.org
+  - imap.deepthot.org
+initialAccount:
+  domain: deepthot.org
+  password: smi12les
+  username: postmaster
+logLevel: DEBUG
+limits:
+  authRatelimit:
+    ip: 100/minute;3600/hour
+    user: 100/day
+  messageSizeLimitInMegabytes: 200
+persistence:
+  size: 100Gi
+  accessModes:
+    - ReadWriteMany
+secretKey: chang3m3!
+ingress.existingSecret: deepthot-org-prod-tls
+mailu.certificatesSecretName: deepthot-org-prod-tls
+ingress.secrets: deepthot-org-prod-tls
+recipientDelimiter: "+-"
