@@ -1,11 +1,11 @@
-domain: mailu.local.deepthot.org
+domain: deepthot.org
 hostnames:
   - mail.deepthot.org
   - smtp.deepthot.org
   - imap.deepthot.org
 initialAccount:
   domain: deepthot.org
-  password: smi12les
+  password: chang3m3!
   username: postmaster
 logLevel: DEBUG
 limits:
@@ -19,6 +19,15 @@ persistence:
     - ReadWriteMany
 secretKey: chang3m3!
 ingress.existingSecret: deepthot-org-prod-tls
-mailu.certificatesSecretName: deepthot-org-prod-tls
-ingress.secrets: deepthot-org-prod-tls
+ingress.tls: false
+
 recipientDelimiter: "+-"
+
+networkPolicy.ingressController.namespace: traefik
+app.kubernetes.io/name: traefik
+app.kubernetes.io/instance: traefik
+app.kubernetes.io/component: traefik
+wildcardSenders: denebeim
+
+admin.livenessProbe.enabled: false
+admin.readinessProbe.enabled: false

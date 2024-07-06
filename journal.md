@@ -534,6 +534,62 @@ Client:
   sudo wg-quick up deepthot
 
 
+# Mail Server
+Today I'm going to set up the mail server.  Here are the goals:
+1. Configure outgoing mail
+2. Configure incoming mail
+3. Configure an MUA
+4. Configure spam handling
+5. Configure DDOS handling
+
+## Configuring outgoing mail
+According to [ubuntu](https://ubuntu.com/server/docs/mail-postfix) postfix is the default MTA on ubuntu.  I normally went with exim, but I'm getting too old for that shit, so let's go with postfix.
+
+Following the documentation above:
+1. `sudo apt install postfix`
+2. `sudo dpkg-reconfigure postfix` set stuff there that's you'd expect
+
+If you want to actually like deliver mail, you better turn on spf at least, and probably dkim.  Instructions on doing that are provided by the every perky [linuxbabe](https://www.linuxbabe.com/mail-server/setting-up-dkim-and-spf)
+
+All you need to do is add a txt record on your DNS reading
+`@ txt v=spf1 mx ~all`
+that's good enough to get most of your mail delivered.
+
+To get the same for yourself:
+```bash
+sudo apt install postfix-policyd-spf-python
+cat <<EOF | sudo tee /etc/postfix/master.cf
+policyd-spf  unix  -       n       n       -       0       spawn
+    user=policyd-spf argv=/usr/bin/policyd-spf
+EOF
+sudo cat <<EOF | sudo tee /etc/postfix/main.cf
+policyd-spf_time_limit = 3600
+smtpd_recipient_restrictions =
+   permit_mynetworks,
+   permit_sasl_authenticated,
+   reject_unauth_destination,
+   check_policy_service unix:private/policyd-spf
+EOF
+sudo systemctl restart postfix
+```
+DKIM is better, here is how to set it up
+
+```bash
+sudo apt install opendkim opendkim-tools
+sudo gpasswd -a postfix opendkim
+sudo sed -i '/#LogWhy/aLogWhy yes' /etc/opendkim.conf
+```
+Actually there's more than I want to deal with here, so go to linuxbabe's site.
+
+
+
+> Written with [StackEdit](https://stackedit.io/).
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbMTY3MjI2ODIwMV19
+-->
+
+Meh, I'm tired of this, I really want mailu.
+
 # Notes:
 
 `kubectl patch challenge <challenge-name> -p '{"metadata":{"finalizers":null}}' --type=merge`  something like this can  work for about anything in
