@@ -329,7 +329,6 @@ This takes a *long* time.  Go off and do something.
 After it's done the admin password can be displayed with `kubectl get secret awx-admin-password -o jsonpath="{.data.password}" | base64 --decode&&echo`  
 
 
-NOTE: remember [krew](https://krew.sigs.k8s.io/docs/user-guide/setup/install/) for managing kubectl files 
 ToDo: document creating traefik and cert-manager
 
 ### Dynamic Proxmox Inventory
@@ -434,6 +433,8 @@ EOF
 
   It's working pretty well, still speed issues.  I want my old computer back.
 
+  This is all done and there's an ansible playbook to create the machine
+
 ## Torrent
 Ansible script that spins up a vm, joins our domain, installs torrent and openvpn, configures them, installs filebot, and configures it.
 
@@ -447,7 +448,7 @@ These are very DB heavy, a local disk is important.
 docker run -d \
   --name sonarr \
   -p 8989:8989 \
-  -e PUID=118 \
+  -e PUID=2000 \
   -e PGID=1847800012 \
   -e UMASK=002 \
   -e TZ="America/Phoenix" \
@@ -460,7 +461,7 @@ docker run -d \
 docker run -d \
   --name prowlarr \
   -p 9696:9696 \
-  -e PUID=118 \
+  -e PUID=2000 \
   -e PGID=1847800012 \
   -e UMASK=002 \
   -e TZ="America/Phoenix" \
@@ -473,7 +474,7 @@ docker run -d \
 docker run -d \
   --name radarr \
   -p 7878:7878 \
-  -e PUID=118 \
+  -e PUID=2000 \
   -e PGID=1847800012 \
   -e UMASK=002 \
   -e TZ="America/Phoenix" \
@@ -596,3 +597,5 @@ Meh, I'm tired of this, I really want mailu.
 kubernetes.  Assuming you can figure out what the target is.
 
 https://k9scli.io/topics/install/ it's awesome haha
+
+NOTE: remember [krew](https://krew.sigs.k8s.io/docs/user-guide/setup/install/) for managing kubectl files 
