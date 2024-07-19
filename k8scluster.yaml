@@ -1,13 +1,13 @@
 ---
 
-- hosts: eddie
+- hosts: heartogold
   remote_user: root
   gather_facts: no
   any_errors_fatal: true
 
   vars:
     clone: ubuntu-cloud
-    api_host: eddie
+    api_host: heartogold
   
   tasks:
     - name: "create nodes"
@@ -32,11 +32,11 @@
         - {vmname: '{{cluster}}-work1',newid: 405, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G, storage: local-lvm}
         - {vmname: '{{cluster}}-work2',newid: 406, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G, storage: local-lvm}
         - {vmname: '{{cluster}}-work3',newid: 407, mytags: ['k8s','ipa','worker'], cores: 8, memory: 8192, size: 16G, storage: local-lvm}
-        - {vmname: '{{cluster}}-store1',newid: 411, mytags: ['k8s','ipa','store'], cores: 2, memory: 2048, size: 200G, storage: dell-zfs}
-        - {vmname: '{{cluster}}-store2',newid: 412, mytags: ['k8s','ipa','store'], cores: 2, memory: 2048, size: 200G, storage: dell-zfs}
-        - {vmname: '{{cluster}}-store3',newid: 413, mytags: ['k8s','ipa','store'], cores: 2, memory: 2048, size: 200G, storage: dell-zfs}
-        - {vmname: '{{cluster}}-store4',newid: 414, mytags: ['k8s','ipa','store'], cores: 2, memory: 2048, size: 200G, storage: dell-zfs}
-        - {vmname: '{{cluster}}-store5',newid: 415, mytags: ['k8s','ipa','store'], cores: 2, memory: 2048, size: 300G, storage: dell-zfs}
+        - {vmname: '{{cluster}}-store1',newid: 411, mytags: ['k8s','ipa','store'], cores: 2, memory: 2048, size: 300G, storage: zfs}
+        - {vmname: '{{cluster}}-store2',newid: 412, mytags: ['k8s','ipa','store'], cores: 2, memory: 2048, size: 300G, storage: zfs}
+        - {vmname: '{{cluster}}-store3',newid: 413, mytags: ['k8s','ipa','store'], cores: 2, memory: 2048, size: 300G, storage: zfs}
+        - {vmname: '{{cluster}}-store4',newid: 414, mytags: ['k8s','ipa','store'], cores: 2, memory: 2048, size: 300G, storage: zfs}
+        - {vmname: '{{cluster}}-store5',newid: 415, mytags: ['k8s','ipa','store'], cores: 2, memory: 2048, size: 300G, storage: zfs}
 
 - hosts: "tag_k8s"
   remote_user: ansible

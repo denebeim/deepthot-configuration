@@ -1,0 +1,8 @@
+---
+apiVersion: awx.ansible.com/v1beta1
+kind: AWXRestore
+metadata:
+  name: awxbackup-2024-07-19
+  namespace: awx
+spec:
+  deployment_name: k8s
