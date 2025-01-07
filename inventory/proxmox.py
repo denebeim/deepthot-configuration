@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 
 # Copyright (C) 2014  Mathieu GAUTHIER-LAFAYE <gauthierl@lapth.cnrs.fr>
@@ -227,9 +226,10 @@ class ProxmoxAPI(object):
             config = self.get('api2/json/nodes/{0}/lxc/{1}/config'.format(node, vm))
         except HTTPError:
             return False
-        
+
+        print()
         try:
-            ip_address = re.search('ip=(\d*\.\d*\.\d*\.\d*)', config['net0']).group(1)
+            ip_address = re.search('ip=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', config['net0']).group(1)
             return ip_address
         except:
             return False

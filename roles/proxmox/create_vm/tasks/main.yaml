@@ -27,7 +27,7 @@
         net:
           net0: "bridge=vmbr0"
           # ipconfig0: "{{'gw=192.168.42.1,ip={{IP}}/24' if IP is defined else omit}}"
-         
+        agent: "enabled=1,fstrim_cloned_disks=1"
         kvm: true
         cpu: "host"
         memory: "{{ omit if memory is not defined else memory }}"
@@ -39,7 +39,6 @@
         machine: "{{omit if machine is not defined else machine}}"
         vga: "std"
         ostype: "l26"
-        agent: "yes"
         autostart: "{{autostart}}"
       changed_when: false
 

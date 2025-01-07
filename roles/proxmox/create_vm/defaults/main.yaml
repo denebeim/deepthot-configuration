@@ -1,7 +1,7 @@
     api_user: "{{ lookup('ansible.builtin.env','PROXMOX_USER')}}"
     api_password: "{{ lookup('ansible.builtin.env','PROXMOX_PASSWORD') }}"
-    api_host: eddie
-    storage: dell-zfs
+    api_host: heartogold
+    storage: zfs3tb
     clone: ubuntu-cloud
     size: 8G
     autostart: false

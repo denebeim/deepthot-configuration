@@ -21,7 +21,7 @@
   # roles:
   #   - proxmox/create_vm
 
-- hosts: 192.168.0.2
+- hosts: heartogold
   remote_user: denebeim
   become: true
   gather_facts: yes

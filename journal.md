@@ -471,18 +471,7 @@ docker run -d \
   --restart unless-stopped \
   ghcr.io/hotio/prowlarr
 
-docker run -d \
-  --name radarr \
-  -p 7878:7878 \
-  -e PUID=2000 \
-  -e PGID=1847800012 \
-  -e UMASK=002 \
-  -e TZ="America/Phoenix" \
-  -v /home/arr/radarr/config:/config \
-  -v /home/arr/radarr/data:/data \
-  -v /media/auto/video:/media/auto/video \
-  --restart unless-stopped \
-  ghcr.io/hotio/radarr
+
 
 docker run -d \
   --name=flaresolverr \
