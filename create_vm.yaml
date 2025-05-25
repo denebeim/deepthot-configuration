@@ -25,7 +25,7 @@
         name: proxmox/create_vm
         public: true
       loop:
-        - {vmname: 'testing',newid: 100, mytags: ['ipa','new'], cores: 2, memory: 4096, size: 12G, storage: "heartogold", clone: 1102}
+        - {vmname: 'valheim',newid: 500, mytags: ['docker','ipa','new'], cores: 2, memory: 8192, size: 12G, storage: "heartogold", clone: 1001}
 
 - hosts: "tag_new"
   remote_user: ansible
