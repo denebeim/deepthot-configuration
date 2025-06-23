@@ -15,7 +15,7 @@ spec:
 
   ingress_type: ingress
   ingress_hosts:
-    - hostname: myawx.deepthot.aa
+    - hostname: myawx.local.deepthot.org
       tls_secret: awx-secret-tls
 
   postgres_configuration_secret: awx-postgres-configuration

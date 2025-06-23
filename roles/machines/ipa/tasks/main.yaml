@@ -31,7 +31,7 @@
     line: "automount:\tfiles sss"
 
 - hostname:
-    name: "{{ ansible_hostname }}.deepthot.aa"
+    name: "{{ ansible_hostname }}.local.deepthot.org"
     use: systemd
 
 - timezone:

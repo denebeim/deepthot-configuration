@@ -112,6 +112,6 @@ rm ubuntu-24.04-server-cloudimg-amd64.img
 ##Rocky 8 latest
 #wget "http://dl.rockylinux.org/pub/rocky/8/images/x86_64/Rocky-8-GenericCloud.latest.x86_64.qcow2"
 #create_template 930 "temp-rocky-8" "Rocky-8-GenericCloud.latest.x86_64.qcow2"
-##Rocky 9 latest
-#wget "http://dl.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud.latest.x86_64.qcow2"
-#create_template 931 "temp-rocky-9" "Rocky-9-GenericCloud.latest.x86_64.qcow2"
+#Rocky 9 latest
+wget "http://dl.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud.latest.x86_64.qcow2"
+create_template 931 "temp-rocky-9" "Rocky-9-GenericCloud.latest.x86_64.qcow2"
