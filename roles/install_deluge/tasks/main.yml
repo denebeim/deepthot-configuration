@@ -4,7 +4,7 @@
 - name: Ensure deluge user has the right uid
   user:
     name: debian-deluged
-    group: media@deepthot.aa
+    group: media@local.deepthot.org
     uid: 118
     home: /var/lib/deluged
     shell: /usr/sbin/nologin

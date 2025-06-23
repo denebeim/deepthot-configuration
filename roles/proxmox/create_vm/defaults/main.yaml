@@ -5,4 +5,4 @@
     clone: ubuntu-cloud
     size: 8G
     autostart: false
-    domain: "deepthot.aa"
+    domain: "local.deepthot.org"
