@@ -331,6 +331,8 @@ Note: This is all obsolete. I never got around to mucking with the MAC addresses
 | ec:8e:b5:d7:81:13 | 5     | pve         | second host              |
 | 00:80:87:b2:1a:af | 6     | printer     | duh                      |
 | 00:17:88:4c:de:9e | 7     | h2gt2g      | SAN                      |
+|                   | 8     | auth        | authentication           |
+| bc:24:11:f5:bd:16 | 15    | dmz         | dmz                      |
 |                   | 20-29 | k8s cluster |                          |
 |                   | 20    | k8s         | shared API               |
 | 12:00:00:00:00:21 | 21    | k8s-cont-1  | Control Node 1           |
@@ -703,11 +705,12 @@ Duh
 My old freeIPA stopped working. This may have been due to the memory going bad on my HP, dunno. Anyway, the freeIPA I
 have is running on a very old redhat install. I really wanna smack redhat, but they pull down the mirrors when a version
 of the OS goes obsolete, that makes it
-impossible to upgrade it to a newer version.  Enough belly aching.
+impossible to upgrade it to a newer version. Enough belly aching.
 
-Getting IPA to work with synology: https://thomascfoulds.com/2023/05/13/synology-nfs-with-freeipa-ldap.html Haven't tried
-it yet, but that's what I'm going to try first.  I recall doing most of this back in the day, why freeipa is missing 
-the schema for something as common as NFSv4 I have no idea.  Seems dumb, I wonder why.
+Getting IPA to work with synology: https://thomascfoulds.com/2023/05/13/synology-nfs-with-freeipa-ldap.html Haven't
+tried
+it yet, but that's what I'm going to try first. I recall doing most of this back in the day, why freeipa is missing
+the schema for something as common as NFSv4 I have no idea. Seems dumb, I wonder why.
 
 First thing is to define the schema for ldap to access nfsv4:
 
@@ -751,12 +754,13 @@ MAY ( cn $ memberUid $ description) )
 EOF
 ```
 
-Still haven't made it work, *sigh*.  nvm right now.
+Still haven't made it work, *sigh*. nvm right now.
 
 ### Setting up sudo
+
 ```bash
 ipa group-add --gid=110 admin
 ipa group-add-member --groups=admins admin
 ```
 
-This is I think hacky.  The real way would be with sssd controlled with ipa, but I haven't found out how to do that yet.
+This is I think hacky. The real way would be with sssd controlled with ipa, but I haven't found out how to do that yet.

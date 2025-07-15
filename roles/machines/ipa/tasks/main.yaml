@@ -3,8 +3,8 @@
   meta: end_play
   when: "'tag_ipa' not in group_names"
 
-- wait_for: host="{{ansible_hostname}}" port=22 delay=5  timeout=300
-  name: Wait for "{{ansible_hostname}}" to boot
+#- wait_for: host="{{ansible_hostname}}" port=22 delay=5  timeout=300
+#  name: Wait for "{{ansible_hostname}}" to boot
 
 - name: Wait for automatic system updates
   become: true
