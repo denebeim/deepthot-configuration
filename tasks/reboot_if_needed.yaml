@@ -27,5 +27,5 @@
     test_command: uptime
   when: (reboot_required_file.matched or reboot_required_debian.stat.exists) or (ansible_os_family == "RedHat" and reboot_required_redhat.rc == 0)
 
-- wait_for: host="{{inventory_hostname}}" port=22 delay=10  timeout=300
-  name: Wait for system to be stable
+#- wait_for: host="{{inventory_hostname}}" port=22 delay=10  timeout=300
+#  name: Wait for system to be stable

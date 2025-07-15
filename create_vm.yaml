@@ -26,7 +26,7 @@
         public: true
       loop:
 #        - {vmname: 'valheim',newid: 500, mytags: ['docker','ipa','new'], cores: 2, memory: 8192, size: 12G, storage: "heartogold", clone: 1001}
-        - {vmname: 'testing', mytags: ['docker','ipa','new'], cores: 2, memory: 8192, size: 12G, storage: "heartogold", clone: 1001}
+        - {vmname: 'auth', mytags: ['docker','ipa','new'], cores: 2, memory: 8192, size: 12G, storage: "heartogold", clone: 1001, newid: 208}
 
 - hosts: "tag_new"
   remote_user: ansible
