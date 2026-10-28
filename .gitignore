@@ -299,3 +299,4 @@ pip-selfcheck.json
 ### Ansible template
 *.retry
 inventory/myinv.json
+foo.key

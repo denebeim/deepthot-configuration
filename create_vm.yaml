@@ -7,11 +7,11 @@
   vars:
     clone: deepthot-image-1
     api_host: heartogold
-  
+
   tasks:
     - name: "create nodes"
       vars:
-        vmname: "{{item.vmname}}"
+        vmname: "{{ item.vmname }}"
         newid: "{{item.newid}}"
         mytags: "{{item.mytags}}"
         cores: "{{item.cores}}"
@@ -25,13 +25,13 @@
         name: proxmox/create_vm
         public: true
       loop:
-#        - {vmname: 'valheim',newid: 500, mytags: ['docker','ipa','new'], cores: 2, memory: 8192, size: 12G, storage: "heartogold", clone: 1001}
-        - {vmname: 'auth', mytags: ['docker','ipa','new'], cores: 2, memory: 8192, size: 12G, storage: "heartogold", clone: 1001, newid: 208}
+        - {vmname: 'valheim', newid: 500, mytags: ['ipa', 'new'], cores: 2, memory: 8192, size: 32G, storage: "heartogold", clone: 1102}
+#        - {vmname: 'auth', mytags: ['docker','ipa','new'], cores: 2, memory: 8192, size: 12G, storage: "heartogold", clone: 1001, newid: 208}
 
 - hosts: "tag_new"
   remote_user: ansible
   become: true
-  gather_facts: yes 
+  gather_facts: yes
   name: Prepare nodes
   any_errors_fatal: true
 

@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+    name: demodeploy 
+    labels:
+        app: demoapp
+spec:
+    selector:
+        matchLabels:
+            app: app
+
+    replicas: 1000
+    template:
+        metadata:
+            name: demopod
+            labels:
+                app: app
+        spec:
+            containers:
+            - name: busybox
+              image: busybox
