@@ -1,0 +1,27 @@
+---
+# Role: pihole
+# Manages the pihole DNS/DHCP server on `services`.
+#
+# Idempotency: `copy` is content-idempotent (no change if the deployed toml
+# already matches the committed source); `systemd` is idempotent; the restart
+# handler only fires on toml change.
+#
+# The canonical config committed at roles/pihole/files/pihole.toml is the
+# SINGLE source of truth for pihole's DNS/DHCP settings. Pihole is already
+# installed on the target (native, /etc/pihole), so this role only manages
+# config + service state — no install-method assumptions are made here.
+
+- name: Deploy canonical pihole config (.toml source of truth)
+  ansible.builtin.copy:
+    src: pihole.toml
+    dest: "{{ pihole_toml_dest }}"
+    owner: root
+    group: root
+    mode: "0640"
+  notify: Restart pihole-FTL
+
+- name: Ensure pihole-FTL service is enabled and running
+  ansible.builtin.systemd:
+    name: pihole-FTL
+    enabled: true
+    state: started

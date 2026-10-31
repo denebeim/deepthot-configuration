@@ -1,0 +1,7 @@
+---
+# Defaults for roles/pihole
+#
+# Canonical pihole config file — committed at roles/pihole/files/pihole.toml and
+# deployed verbatim by the copy task. (Pihole v6 stores its single config at
+# /etc/pihole/pihole.toml; adjust if your install differs.)
+pihole_toml_dest: /etc/pihole/pihole.toml

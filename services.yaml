@@ -1,0 +1,32 @@
+---
+# =============================================================================
+# Playbook: services.yaml
+# Description: Configures the `services` VM (pihole DNS + DHCP for deepthot).
+#              The pihole config is managed as the CANONICAL SOURCE OF TRUTH by
+#              roles/pihole (deploys the committed /etc/pihole/<toml> verbatim,
+#              then restarts pihole-FTL). Dynamic DHCP reservations are handled
+#              by pihole itself; static DNS/DHCP records live in that toml.
+# Inventory is the dynamic Proxmox script (inventory/proxmox.py); `services`
+# resolves to VM 202 @ 192.168.42.2 (Ubuntu 22.04, tag: ubuntu).
+# Mirrors hermes.yaml's configure-play. VM provisioning on heartogold
+# (proxmox/create_vm) is intentionally NOT included here — services already
+# exists; a from-scratch provision play can be added separately.
+# =============================================================================
+
+- name: Configure services (pihole DNS/DHCP)
+  hosts: services
+  remote_user: ansible
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Wait for cloud-init to finish provisioning
+      ansible.builtin.command: cloud-init status --wait
+      changed_when: false
+
+    - name: Wait for apt locks to release
+      ansible.builtin.shell: while sudo fuser /var/lib/dpkg/lock-frontend /var/lib/apt/lists/lock >/dev/null 2>&1; do sleep 1; done;
+      changed_when: false
+
+  roles:
+    - role: pihole

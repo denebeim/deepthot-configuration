@@ -1,0 +1,69 @@
+---
+# Provision Hermes VM: NVIDIA drivers, Ollama, Hermes Agent, nginx, profiles
+- name: Install NVIDIA drivers for Quadro K5200 (GK110)
+  hosts: hermes
+  remote_user: ansible
+  become: true
+  tasks:
+    - name: Install NVIDIA 470xx driver
+      ansible.builtin.apt:
+        name:
+          - nvidia-driver-470
+          - nvidia-utils-470
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install nvidia-docker2 (GPU runtime for containers)
+      ansible.builtin.shell: |
+        curl -fsSL https://nvidia.github.io/libnvidia/libnvidia.list | tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+        apt-get update -qq
+        apt-get install -y nvidia-docker2
+        systemctl restart docker
+      args:
+        creates: /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+    - name: Verify GPU is visible
+      ansible.builtin.command: nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
+      register: gpu_info
+      changed_when: false
+
+    - name: Show GPU info
+      ansible.builtin.debug:
+        msg: "GPU: {{ gpu_info.stdout }}"
+
+    - name: Install Ollama (local AI model runtime)
+      ansible.builtin.shell: |
+        curl -fsSL https://ollama.com/install.sh | sh
+      args:
+        creates: /usr/local/bin/ollama
+
+    - name: Ensure ollama user exists and has GPU access
+      ansible.builtin.user:
+        name: ollama
+        groups: video
+        append: true
+
+    - name: Enable and start Ollama service
+      ansible.builtin.systemd:
+        name: ollama
+        enabled: true
+        state: started
+        scope: system
+
+    - name: Wait for Ollama to be ready
+      ansible.builtin.wait_for:
+        port: 11434
+        timeout: 30
+        state: started
+
+    - name: Pull qwen3.5:4b model (matches local config, fits in 8GB VRAM)
+      ansible.builtin.shell: |
+        ollama pull qwen3.5:4b
+      async: 600
+      poll: 0
+      register: ollama_pull
+
+    - name: Show pull status
+      ansible.builtin.debug:
+        msg: "Ollama model pull started (async): {{ ollama_pull.ansible_job_id }}"

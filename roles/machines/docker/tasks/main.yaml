@@ -44,6 +44,11 @@
     system: true
     state: present
 
+- name: Remove legacy Docker APT source before package operations
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/docker.list
+    state: absent
+
 - name: Install Docker 
   ansible.builtin.include_role:
     name: geerlingguy.docker

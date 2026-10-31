@@ -1,0 +1,72 @@
+---
+# =============================================================================
+# Playbook: hermes.yaml
+# Description: Provisions a virtual machine on Proxmox VE (heartogold)
+#              and installs/configures Nous Research Hermes AI Agent.
+# =============================================================================
+
+- name: Provision Hermes VM on Proxmox
+  hosts: "heartogold"
+  remote_user: root
+  gather_facts: false
+
+  vars:
+    clone: "deepthot-24-04"
+    api_host: "heartogold"
+    vmname: "hermes"
+    newid: 314
+    memory: 16384
+    cores: 8
+    size: "40G"
+    storage: "heartogold"
+    IP: "{{ hermes_ip | default('192.168.42.132') }}"
+    gateway: "192.168.42.1"
+    mytags:
+      - hermes
+      - ipa
+      - docker
+
+  roles:
+    - proxmox/create_vm
+
+  post_tasks:
+    - name: Dynamically add Hermes VM to in-memory inventory
+      ansible.builtin.add_host:
+        name: "{{ vmname }}"
+        ansible_host: "{{ IP }}"
+        ansible_user: ansible
+        groups:
+          - hermes
+          - "{{ 'tag_ipa' if 'ipa' in mytags else '' }}"
+          - "{{ 'tag_docker' if 'docker' in mytags else '' }}"
+
+    - name: Wait for SSH port 22 on Hermes VM ({{ IP }})
+      ansible.builtin.wait_for:
+        host: "{{ IP }}"
+        port: 22
+        search_regex: OpenSSH
+        delay: 10
+        timeout: 300
+      delegate_to: localhost
+
+- name: Configure Hermes VM and Install Hermes Agent
+  hosts: hermes
+  remote_user: ansible
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Wait for cloud-init to finish provisioning
+      ansible.builtin.command: cloud-init status --wait
+      changed_when: false
+
+    - name: Wait for apt locks to release
+      ansible.builtin.shell: while sudo fuser /var/lib/dpkg/lock-frontend /var/lib/apt/lists/lock >/dev/null 2>&1; do sleep 1; done;
+      changed_when: false
+
+  roles:
+    - role: machines/ipa
+      when: "'tag_ipa' in group_names"
+    - role: machines/docker
+      when: "'tag_docker' in group_names"
+    - role: hermes

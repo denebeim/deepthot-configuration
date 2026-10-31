@@ -62,7 +62,7 @@
         api_password: "{{api_password}}"
         name: "{{vmname}}"
         state: resized
-        disk: virtio0
+        disk: scsi0
         size: "{{size}}"
 
     - name: Spin up VM

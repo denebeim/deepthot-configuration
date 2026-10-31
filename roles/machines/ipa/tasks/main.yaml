@@ -50,5 +50,23 @@
   include_role:
     name: freeipa.ansible_freeipa.ipaclient
 
+- name: Register this host's A-record in IPA DNS (idempotent)
+  # Creates/updates e.g. hermes.local.deepthot.org -> 192.168.42.132 in the
+  # IPA DNS zone `local.deepthot.org`. community.general.ipa_dnsrecord speaks
+  # to ipa.local.deepthot.org as `admin` via ipaadmin_password (vault, through
+  # the ipaclient role). Uses ansible.module_utils.urls.fetch_url, so it needs
+  # no system python packages beyond an ansible-enrolled target host.
+  community.general.ipa_dnsrecord:
+    ipa_host: "ipa.local.deepthot.org"
+    ipa_user: "{{ ipaadmin_principal | default('admin') }}"
+    ipa_pass: "{{ ipaadmin_password }}"
+    zone_name: "local.deepthot.org"
+    record_name: "{{ ansible_hostname }}"
+    record_type: "A"
+    record_value: "{{ ansible_default_ipv4.address }}"
+    state: present
+    validate_certs: false
+  become: true
+
 - name: Fix Automount
   include_tasks: fix_automount.yaml
