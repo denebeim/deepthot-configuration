@@ -1,0 +1,556 @@
+---
+# Ansible playbook: Set up Hermes web portal on the hermes VM.
+# Landing page at http://hermes.local.deepthot.org/
+# Per-profile dashboards at:
+#   http://hermes.local.deepthot.org/denebeim/   (port 9119)
+#   http://hermes.local.deepthot.org/cheryl/     (port 9120)
+#   http://hermes.local.deepthot.org/martin/     (port 9121)
+#
+# Run with:
+#   ansible-playbook setup_hermes_web_portal.yaml -i inventory/hosts.ini \
+#     --vault-password-file ~/.vault-pass.txt -b --become-method sudo
+
+- name: Set up Hermes web portal on VM
+  hosts: hermes
+  become: true
+
+  vars:
+    hermes_user: hermes
+    hermes_home: /home/hermes
+    web_root: /var/www/hermes
+    dashboard_port_denebeim: 9119
+    dashboard_port_cheryl: 9120
+    dashboard_port_martin: 9121
+
+  pre_tasks:
+    - name: Ensure PATH includes hermes local bin for non-root commands
+      set_fact:
+        hermes_bin: "/home/hermes/.local/bin"
+
+  tasks:
+
+    # ── 1. Disable the old headless hermes-serve service ──────────────
+    - name: Stop and disable hermes-serve (replaced by per-profile dashboards)
+      systemd:
+        name: hermes-serve.service
+        enabled: false
+        state: stopped
+      ignore_errors: true
+
+    # ── 2. Kill any leftover nohup serve processes on dashboard ports ──
+    - name: Kill existing serve processes on dashboard ports
+      shell: |
+        for port in 9119 9120 9121; do
+          pid=$(ss -tlnp 2>/dev/null | grep ":${port} " | grep -oP 'pid=\K[0-9]+' || true)
+          [ -n "$pid" ] && kill "$pid" 2>/dev/null || true
+        done
+        sleep 1
+      ignore_errors: true
+
+    # ── 3. Install nginx ───────────────────────────────────────────────
+    - name: Ensure nginx is installed
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+      notify:
+        - Reload nginx
+
+    # ── 4. Create web root ─────────────────────────────────────────────
+    - name: Create web portal directory
+      file:
+        path: "{{ web_root }}"
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: '0755'
+
+    # ── 5. Landing page HTML ───────────────────────────────────────────
+    - name: Deploy landing page index.html
+      copy:
+        content: |
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title>Hermes on Deepthot</title>
+            <link rel="stylesheet" href="/style.css" />
+          </head>
+          <body>
+            <div class="container">
+              <header>
+                <h1>Hermes on Deepthot</h1>
+                <p class="subtitle">Household AI assistants — local network only</p>
+              </header>
+
+              <div class="portals">
+                <a href="/denebeim/" class="portal-card">
+                  <div class="avatar avatar-joy">JD</div>
+                  <h2>Joy</h2>
+                  <p class="description">System owner &amp; admin</p>
+                  <span class="enter-btn">Enter →</span>
+                </a>
+
+                <a href="/cheryl/" class="portal-card">
+                  <div class="avatar avatar-cheryl">CM</div>
+                  <h2>Cheryl</h2>
+                  <p class="description">Personal AI assistant</p>
+                  <span class="enter-btn">Enter →</span>
+                </a>
+
+                <a href="/martin/" class="portal-card">
+                  <div class="avatar avatar-martin">MJ</div>
+                  <h2>Martin</h2>
+                  <p class="description">Personal AI assistant</p>
+                  <span class="enter-btn">Enter →</span>
+                </a>
+              </div>
+
+              <footer>
+                <p>Available on local network only · hermes.local.deepthot.org</p>
+              </footer>
+            </div>
+          </body>
+          </html>
+        dest: "{{ web_root }}/index.html"
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    # ── 6. Landing page CSS ────────────────────────────────────────────
+    - name: Deploy landing page style.css
+      copy:
+        content: |
+          :root {
+            --background: #0d0d0e;
+            --card: #1a1a1c;
+            --foreground: #f0f0f0;
+            --muted: #8a8a8e;
+            --accent: #3b82f6;
+            --border: #2a2a2c;
+            --joy-color: #3b82f6;
+            --cheryl-color: #f43f5e;
+            --martin-color: #10b981;
+          }
+
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+
+          body {
+            background: var(--background);
+            color: var(--foreground);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .container {
+            max-width: 900px;
+            width: 100%;
+            padding: 2rem 1rem;
+          }
+
+          header {
+            text-align: center;
+            margin-bottom: 3rem;
+          }
+
+          header h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+          }
+
+          .subtitle {
+            color: var(--muted);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+          }
+
+          .portals {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+          }
+
+          .portal-card {
+            display: block;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+          }
+
+          .portal-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            border-color: var(--accent);
+          }
+
+          .avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 28px;
+            color: #fff;
+            transition: transform 0.2s ease;
+          }
+
+          .portal-card:hover .avatar {
+            transform: scale(1.05);
+          }
+
+          .avatar-joy { background: var(--joy-color); }
+          .avatar-cheryl { background: var(--cheryl-color); }
+          .avatar-martin { background: var(--martin-color); }
+
+          .portal-card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+          }
+
+          .description {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+          }
+
+          .enter-btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: background 0.2s ease;
+          }
+
+          .portal-card:hover .enter-btn {
+            background: #2563eb;
+          }
+
+          footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: var(--muted);
+            font-size: 0.85rem;
+          }
+
+          @media (max-width: 600px) {
+            header h1 { font-size: 2rem; }
+            .portal-card { padding: 1.5rem; }
+          }
+        dest: "{{ web_root }}/style.css"
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    # ── 7. Nginx site config ───────────────────────────────────────────
+    - name: Deploy nginx site config
+      copy:
+        content: |
+          # Hermes Web Portal — landing page + per-profile dashboards
+          # Dashboards are bound to 127.0.0.1 (auth disabled) and proxied through nginx.
+
+          server {
+              listen 80;
+              server_name hermes.local.deepthot.org;
+
+              root /var/www/hermes;
+              index index.html;
+
+              location = / {
+                  try_files /index.html =404;
+              }
+
+              location /style.css {
+                  try_files /style.css =404;
+              }
+
+              location = /favicon.ico {
+                  return 204;
+              }
+
+              # Redirect without trailing slash
+              location = /denebeim { return 301 /denebeim/; }
+              location = /cheryl   { return 301 /cheryl/; }
+              location = /martin   { return 301 /martin/; }
+
+              # --- Denebeim (Joy) dashboard → port 9119 ---
+              location /denebeim/ {
+                  proxy_pass http://127.0.0.1:{{ dashboard_port_denebeim }}/;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade           $http_upgrade;
+                  proxy_set_header Connection        "upgrade";
+                  proxy_set_header Host              127.0.0.1;
+                  proxy_set_header X-Real-IP         $remote_addr;
+                  proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+
+                  sub_filter '__HERMES_BASE_PATH__=""' '__HERMES_BASE_PATH__="/denebeim"';
+                  sub_filter 'href="/assets/'     'href="/denebeim/assets/';
+                  sub_filter 'src="/assets/'       'src="/denebeim/assets/';
+                  sub_filter 'href="/favicon.ico"' 'href="/denebeim/favicon.ico"';
+                  sub_filter_once off;
+                  sub_filter_types text/html application/javascript text/css application/json;
+                  proxy_set_header Accept-Encoding "";
+
+                  proxy_read_timeout 86400;
+                  proxy_send_timeout 86400;
+                  proxy_buffering off;
+              }
+
+              # --- Cheryl dashboard → port 9120 ---
+              location /cheryl/ {
+                  proxy_pass http://127.0.0.1:{{ dashboard_port_cheryl }}/;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade           $http_upgrade;
+                  proxy_set_header Connection        "upgrade";
+                  proxy_set_header Host              127.0.0.1;
+                  proxy_set_header X-Real-IP         $remote_addr;
+                  proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+
+                  sub_filter '__HERMES_BASE_PATH__=""' '__HERMES_BASE_PATH__="/cheryl"';
+                  sub_filter 'href="/assets/'     'href="/cheryl/assets/';
+                  sub_filter 'src="/assets/'       'src="/cheryl/assets/';
+                  sub_filter 'href="/favicon.ico"' 'href="/cheryl/favicon.ico"';
+                  sub_filter_once off;
+                  sub_filter_types text/html application/javascript text/css application/json;
+                  proxy_set_header Accept-Encoding "";
+
+                  proxy_read_timeout 86400;
+                  proxy_send_timeout 86400;
+                  proxy_buffering off;
+              }
+
+              # --- Martin dashboard → port 9121 ---
+              location /martin/ {
+                  proxy_pass http://127.0.0.1:{{ dashboard_port_martin }}/;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade           $http_upgrade;
+                  proxy_set_header Connection        "upgrade";
+                  proxy_set_header Host              127.0.0.1;
+                  proxy_set_header X-Real-IP         $remote_addr;
+                  proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+
+                  sub_filter '__HERMES_BASE_PATH__=""' '__HERMES_BASE_PATH__="/martin"';
+                  sub_filter 'href="/assets/'     'href="/martin/assets/';
+                  sub_filter 'src="/assets/'       'src="/martin/assets/';
+                  sub_filter 'href="/favicon.ico"' 'href="/martin/favicon.ico"';
+                  sub_filter_once off;
+                  sub_filter_types text/html application/javascript text/css application/json;
+                  proxy_set_header Accept-Encoding "";
+
+                  proxy_read_timeout 86400;
+                  proxy_send_timeout 86400;
+                  proxy_buffering off;
+              }
+          }
+        dest: /etc/nginx/sites-available/hermes
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Enable hermes nginx site (symlink)
+      file:
+        src: /etc/nginx/sites-available/hermes
+        dest: /etc/nginx/sites-enabled/hermes
+        state: link
+        force: true
+
+    - name: Disable default nginx site
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+    - name: Test nginx config
+      command: nginx -t
+      register: nginx_test
+      changed_when: false
+
+    # ── 8. Systemd dashboard services ──────────────────────────────────
+    - name: Copy hermes-dashboard@.service template
+      copy:
+        content: |
+          [Unit]
+          Description=Hermes Dashboard (%I)
+          After=network.target docker.service ollama.service
+          Wants=ollama.service
+
+          [Service]
+          Type=simple
+          User={{ hermes_user }}
+          Group={{ hermes_user }}
+          Environment=HOME={{ hermes_home }}
+          Environment=PATH=/home/hermes/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+          EnvironmentFile=-/home/hermes/.hermes/.env
+          ExecStart=/home/hermes/.local/bin/hermes -p %i dashboard --port 0 --host 127.0.0.1 --isolated --no-open --skip-build
+          Restart=on-failure
+          RestartSec=5
+          LimitNOFILE=65536
+
+          [Install]
+          WantedBy=multi-user.target
+        dest: /etc/systemd/system/hermes-dashboard@.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Create denebeim dashboard override (port 9119)
+      file:
+        path: /etc/systemd/system/hermes-dashboard@denebeim.service.d
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      register: denebeim_override_dir
+
+    - name: Write denebeim dashboard override
+      copy:
+        content: |
+          [Service]
+          ExecStart=
+          ExecStart=/home/hermes/.local/bin/hermes -p denebeim dashboard --port 9119 --host 127.0.0.1 --isolated --no-open --skip-build
+        dest: /etc/systemd/system/hermes-dashboard@denebeim.service.d/override.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Create cheryl dashboard override (port 9120)
+      file:
+        path: /etc/systemd/system/hermes-dashboard@cheryl.service.d
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Write cheryl dashboard override
+      copy:
+        content: |
+          [Service]
+          ExecStart=
+          ExecStart=/home/hermes/.local/bin/hermes -p cheryl dashboard --port 9120 --host 127.0.0.1 --isolated --no-open --skip-build
+        dest: /etc/systemd/system/hermes-dashboard@cheryl.service.d/override.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Create martin dashboard override (port 9121)
+      file:
+        path: /etc/systemd/system/hermes-dashboard@martin.service.d
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Write martin dashboard override
+      copy:
+        content: |
+          [Service]
+          ExecStart=
+          ExecStart=/home/hermes/.local/bin/hermes -p martin dashboard --port 9121 --host 127.0.0.1 --isolated --no-open --skip-build
+        dest: /etc/systemd/system/hermes-dashboard@martin.service.d/override.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Reload systemd daemon
+      command: systemctl daemon-reload
+
+    - name: Enable and start denebeim dashboard
+      systemd:
+        name: hermes-dashboard@denebeim.service
+        enabled: true
+        state: started
+        daemon_reload: true
+
+    - name: Enable and start cheryl dashboard
+      systemd:
+        name: hermes-dashboard@cheryl.service
+        enabled: true
+        state: started
+        daemon_reload: true
+
+    - name: Enable and start martin dashboard
+      systemd:
+        name: hermes-dashboard@martin.service
+        enabled: true
+        state: started
+        daemon_reload: true
+
+    - name: Wait for dashboards to be ready
+      wait_for:
+        port: "{{ item }}"
+        host: 127.0.0.1
+        timeout: 30
+      loop:
+        - "{{ dashboard_port_denebeim }}"
+        - "{{ dashboard_port_cheryl }}"
+        - "{{ dashboard_port_martin }}"
+
+    # ── 9. Restart nginx ───────────────────────────────────────────────
+    - name: Ensure nginx is running and enabled
+      systemd:
+        name: nginx
+        enabled: true
+        state: restarted
+        daemon_reload: true
+
+    # ── 10. Add household users to docker group ─────────────────────────
+    - name: Check if docker group exists
+      ansible.builtin.command: getent group docker
+      register: docker_group_check
+      changed_when: false
+      ignore_errors: true
+
+    - name: Add household users to docker group (if docker group exists)
+      user:
+        name: "{{ item }}"
+        groups: docker
+        append: true
+      loop:
+        - cheryl
+        - martin
+      when: docker_group_check.rc == 0
+
+    # ── 11. Configure firewall (local network only) ──────────────────────
+    - name: Check if ufw is available
+      stat:
+        path: /usr/sbin/ufw
+      register: ufw_bin
+
+    - name: Configure ufw firewall rules
+      shell: |
+        ufw default deny incoming
+        ufw default allow outgoing
+        ufw allow from 192.168.42.0/24 to any port 22 comment 'ssh from local net'
+        ufw allow from 192.168.42.0/24 to any port 80 comment 'nginx from local net'
+        ufw --force enable
+      when: ufw_bin.stat.exists
+      ignore_errors: true
+      changed_when: true
+
+  handlers:
+    - name: Reload nginx
+      service:
+        name: nginx
+        state: reloaded

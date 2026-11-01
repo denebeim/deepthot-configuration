@@ -10,6 +10,7 @@ certs/*
 k3s-ansible/*
 context
 *awx-operator*
+.ansible
 
 # Created by .ignore support plugin (hsz.mobi)
 
