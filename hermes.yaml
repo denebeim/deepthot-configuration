@@ -55,13 +55,26 @@
   become: true
   gather_facts: true
 
+  # These will be picked up from the inventory file we fixed above
+  vars:
+    ansible_user: ansible
+    ansible_ssh_common_args: "-o PasswordAuthentication=no"
+
   pre_tasks:
     - name: Wait for cloud-init to finish provisioning
-      ansible.builtin.command: cloud-init status --wait
+      ansible.builtin.command: cloud-init status --wait --long
+      register: cloud_init_status
       changed_when: false
+      failed_when: >-
+        cloud_init_status.rc != 0 and
+        not (
+          cloud_init_status.rc == 2 and
+          'status: done' in cloud_init_status.stdout and
+          'errors: []' in cloud_init_status.stdout
+        )
 
     - name: Wait for apt locks to release
-      ansible.builtin.shell: while sudo fuser /var/lib/dpkg/lock-frontend /var/lib/apt/lists/lock >/dev/null 2>&1; do sleep 1; done;
+      ansible.builtin.shell: while fuser /var/lib/dpkg/lock-frontend /var/lib/apt/lists/lock >/dev/null 2>&1; do sleep 1; done;
       changed_when: false
 
   roles:
